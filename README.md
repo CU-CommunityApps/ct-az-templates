@@ -1,2 +1,2 @@
-# ct-templates
+# Azure templates
 Templates for consumption
