@@ -48,10 +48,10 @@
            }
         },
         "taglist": {
-	        "type": "object",
-	        "defaultValue": {},
-	        "metadata": "Tag object to apply to all created resources.  If not specified, we will attempt to add Cost Center based on parameter 'kfs'."
-	      }
+	    "type": "object",
+	    "defaultValue": {},
+	    "metadata": "Tag object to apply to all created resources.  If not specified, we will attempt to add Cost Center based on parameter 'kfs'."
+	}
     },
     "variables": {
         "nestedTemplates": {
@@ -66,7 +66,7 @@
         "default_tags": {
             "Cost Center": "[parameters('kfs')]"
         },
-	      "taglist": "[if(equals(length(parameters('taglist')),0),variables('default_tags'),parameters('taglist'))]",
+	"taglist": "[if(equals(length(parameters('taglist')),0),variables('default_tags'),parameters('taglist'))]",
         "alert": {
             "Query": "let Events = AzureDiagnostics | where Category == 'AzureBackupReport'; Events | where JobStatus_s != 'Completed' and JobOperation_s == 'Backup' and isnotempty(ProtectedContainerUniqueId_s) | extend VM = tostring(split(ProtectedContainerUniqueId_s, ';')[(arraylength(split(ProtectedContainerUniqueId_s, ';'))-1)]) | extend Duration = toint(JobDurationInSecs_s) / 60 | project VM, Status=JobStatus_s, Vault=Resource, UniqueID=BackupItemUniqueId_s, Code=JobFailureCode_s, Start_Time=todatetime(JobStartDateTime_s), Duration_Mins=Duration | sort by Start_Time",
             "Category": "Backups",
