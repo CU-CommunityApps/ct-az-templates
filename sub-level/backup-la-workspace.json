@@ -1,0 +1,360 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.1",
+    "parameters": {
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+              "description": "Enter log analytics workspace name for monitoring backups"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+              "description": "The location in which the resources should be deployed."
+            }
+        },
+        "kfs": {
+            "type": "string",
+            "metadata": {
+              "description": "Enter KFS account for billing purposes."
+            }
+        },
+        "actionGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Short name (maximum 12 characters) for the Action group."
+            },
+            "maxLength": 12
+        },
+        "email": {
+            "type": "string",
+            "metadata": {
+              "description": "Enter email alert address."
+            }
+        },
+        "_artifactsLocation": {
+           "type": "string",
+           "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-backup-la-reporting/",
+           "metadata": {
+              "description": "The base URI where artifacts required by this template are located"
+           }
+        },
+        "_artifactsLocationSasToken": {
+           "type": "securestring",
+           "defaultValue": "",
+           "metadata": {
+              "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated"
+           }
+        },
+        "taglist": {
+	        "type": "object",
+	        "defaultValue": {},
+	        "metadata": "Tag object to apply to all created resources.  If not specified, we will attempt to add Cost Center based on parameter 'kfs'."
+	      }
+    },
+    "variables": {
+        "nestedTemplates": {
+            "backup_jobs_non_log": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/backup_jobs_non_log.json', parameters('_artifactsLocationSasToken')))]",
+            "backup_jobs_log": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/backup_jobs_log.json', parameters('_artifactsLocationSasToken')))]",
+            "restore_jobs": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/restore_jobs.json', parameters('_artifactsLocationSasToken')))]",
+            "azure_alerts": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/azure_alerts.json', parameters('_artifactsLocationSasToken')))]",
+            "on_prem_alerts": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/on_prem_alerts.json', parameters('_artifactsLocationSasToken')))]",
+            "backup_items": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/backup_items.json', parameters('_artifactsLocationSasToken')))]",
+            "cloud_storage": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/cloud_storage.json', parameters('_artifactsLocationSasToken')))]"
+        },
+        "default_tags": {
+            "Cost Center": "[parameters('kfs')]"
+        },
+	      "taglist": "[if(equals(length(parameters('taglist')),0),variables('default_tags'),parameters('taglist'))]",
+        "alert": {
+            "Query": "let Events = AzureDiagnostics | where Category == 'AzureBackupReport'; Events | where JobStatus_s != 'Completed' and JobOperation_s == 'Backup' and isnotempty(ProtectedContainerUniqueId_s) | extend VM = tostring(split(ProtectedContainerUniqueId_s, ';')[(arraylength(split(ProtectedContainerUniqueId_s, ';'))-1)]) | extend Duration = toint(JobDurationInSecs_s) / 60 | project VM, Status=JobStatus_s, Vault=Resource, UniqueID=BackupItemUniqueId_s, Code=JobFailureCode_s, Start_Time=todatetime(JobStartDateTime_s), Duration_Mins=Duration | sort by Start_Time",
+            "Category": "Backups",
+            "Name": "Backup Report",
+            "DisplayName": "backup-alert",
+            "Description": "Backup alert fires when an error occurs over 1/2 hour interval.",
+            "Severity": "4",
+            "Status": "true",
+            "Type": "ResultCount",
+            "ThresholdOperator": "GreaterThan",
+            "ThresholdValue": 0,
+            "Schedule": {
+                "Name": "schedule",
+                "Interval": 30,
+                "TimeSpan": 30
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2018-05-01",
+            "location": "[parameters('location')]",
+            "name": "[parameters('workspaceName')]",
+            "properties": {},
+            "tags": "[variables('taglist')]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "backupDeployment",
+            "resourceGroup": "[parameters('workspaceName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups/', parameters('workspaceName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.OperationalInsights/workspaces",
+                            "apiVersion": "2015-11-01-preview",
+                            "name": "[parameters('workspaceName')]",
+                            "location": "[parameters('location')]",
+                            "tags": "[variables('taglist')]"
+                        },
+                        {
+                            "type": "Microsoft.Insights/actionGroups",
+                            "apiVersion": "2018-03-01",
+                            "name": "[parameters('actionGroupName')]",
+                            "location": "Global",
+                            "properties": {
+                                "groupShortName": "[parameters('actionGroupName')]",
+                                "enabled": true,
+                                "emailReceivers": [
+                                    {
+                                        "name": "Alert email",
+                                        "emailAddress": "[parameters('email')]"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "[concat(parameters('workspaceName'), '/', variables('alert').Name)]",
+                            "type": "Microsoft.OperationalInsights/workspaces/savedSearches",
+                            "apiVersion": "2017-03-15-preview",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                            ],
+                            "tags": "[variables('taglist')]"
+                            "properties": {
+                                "etag": "*",
+                                "query": "[variables('alert').Query]",
+                                "displayName": "[variables('alert').Name]",
+                                "category": "[variables('alert').Category]"
+                            }
+                        },
+                        {
+                            "name":"[variables('alert').Name]",
+                            "type":"Microsoft.Insights/scheduledQueryRules",
+                            "apiVersion": "2018-04-16",
+                            "location": "[parameters('location')]",
+                            "properties": {
+                                "description": "[variables('alert').Description]",
+                                "enabled": "true",
+                                "source": {
+                                    "query": "[variables('alert').Query]",
+                                    "dataSourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('workspaceName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                                    "queryType":"[variables('alert').Type]"
+                                },
+                                "schedule": {
+                                    "frequencyInMinutes": "[variables('alert').Schedule.Interval]",
+                                    "timeWindowInMinutes": "[variables('alert').Schedule.TimeSpan]"
+                                },
+                                "action": {
+                                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction",
+                                    "severity": "[variables('alert').Severity]",
+                                    "aznsAction": {
+                                        "actionGroup": "[array(concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('workspaceName'), '/providers/Microsoft.Insights/actionGroups/', parameters('actionGroupName')))]"
+                                    },
+                                    "trigger": {
+                                        "thresholdOperator": "[variables('alert').ThresholdOperator]",
+                                        "threshold": "[variables('alert').ThresholdValue]"
+                                    }
+                                },
+                                "tags": "[variables('taglist')]"
+                            },
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Insights/actionGroups/', parameters('actionGroupName'))]",
+                                "[resourceId('Microsoft.OperationalInsights/workspaces/savedSearches/', parameters('workspaceName'), variables('alert').Name)]",
+                                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                            ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "backup_jobs_non_log",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').backup_jobs_non_log]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "backup_jobs_log",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').backup_jobs_log]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "restore_jobs",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').restore_jobs]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "azure_alerts",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').azure_alerts]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "on_prem_alerts",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').on_prem_alerts]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "backup_items",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').backup_items]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        },
+                        {
+                           "apiVersion": "2019-05-01",
+                           "name": "cloud_storage",
+                           "type": "Microsoft.Resources/deployments",
+                           "resourceGroup": "[parameters('workspaceName')]",
+                           "properties": {
+                              "mode": "Incremental",
+                              "templateLink": {
+                                 "uri": "[variables('nestedTemplates').cloud_storage]",
+                                 "contentVersion": "1.0.0.0"
+                              },
+                              "parameters": {
+                                 "location": {
+                                    "value": "[parameters('location')]"
+                                 },
+                                 "workspaceName": {
+                                    "value": "[parameters('workspaceName')]"
+                                 }
+                              }
+                           },
+                           "dependsOn": [
+                               "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                           ]
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
