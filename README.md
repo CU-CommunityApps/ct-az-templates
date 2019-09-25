@@ -1,6 +1,18 @@
 # Azure templates
 Templates for consumption
 
+## Prerequisites
+
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest)
+
+Templates use Azure CLI credentials, so you must start with:
+```
+$ az login --use-device-code
+
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code ABCDEFG1234 to authenticate.
+...
+```
+
 #### [rg-level](rg-level) Resource group deployments
 * https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-template-deploy-cli
 ```
