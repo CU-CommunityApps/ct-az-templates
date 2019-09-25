@@ -1,0 +1,202 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "metadata": {
+              "description": "Enter Server Name (eg. VM1)"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus",
+            "metadata": {
+              "description": "The location in which the resources should be deployed."
+            }
+        },
+        "vaultStorageType": {
+            "type": "string",
+            "defaultValue": "GloballyRedundant",
+            "allowedValues": [
+              "LocallyRedundant",
+              "GloballyRedundant"
+            ],
+            "metadata": {
+              "description": "Change Vault Storage Type (not allowed if the vault has registered backups)"
+            }
+        },
+        "workspace": {
+            "type": "string",
+            "defaultValue": "NONE",
+            "metadata": {
+              "description": "The log analytics workspace name. 'NONE' if no log analytics workspace exists!"
+            }
+        },
+        "workspaceRG": {
+            "type": "string",
+            "defaultValue": "NONE",
+            "metadata": {
+              "description": "The log analytics workspace resource group. 'NONE' if no log analytics workspace exists!"
+            }
+        },
+        "workspaceSub": {
+            "type": "string",
+            "defaultValue": "NONE",
+            "metadata": {
+              "description": "The log analytics workspace subscription.  'NONE' if same as existing."
+            }
+        },
+        "kfs": {
+            "type": "string",
+            "metadata": {
+              "description": "Enter KFS account for billing purposes."
+            }
+        },
+        "scheduleRunTimes": {
+            "type": "string",
+            "allowedValues": [
+              "00:00",
+              "01:00",
+              "02:00",
+              "03:00",
+              "04:00",
+              "05:00",
+              "06:00",
+              "07:00",
+              "08:00",
+              "09:00",
+              "10:00",
+              "11:00",
+              "12:00",
+              "13:00",
+              "14:00",
+              "15:00",
+              "16:00",
+              "17:00",
+              "18:00",
+              "19:00",
+              "20:00",
+              "21:00",
+              "22:00",
+              "23:00"
+            ],
+            "metadata": {
+              "description": "Time of day when backup should be triggered. e.g. 23:00 or 03:00. This will be used in LTR too for daily, weekly, monthly and yearly backup."
+            }
+        },
+	"taglist": {
+	    "type": "object",
+	    "defaultValue": {},
+	    "metadata": "Tag object to apply to all created resources.  If not specified, we will attempt to add Cost Center based on parameter 'kfs'."
+	},
+        "timeZone": {
+            "type": "string",
+            "defaultValue": "Eastern Standard Time",
+            "allowedValues": [
+              "Eastern Standard Time",
+              "Central Standard Time",
+              "Mountain Standard Time",
+              "Pacific Standard Time"
+            ],
+            "metadata": {
+              "description": "Any valid US timezone, for example: Eastern Standard Time, Pacific Standard Time. Refer: https://msdn.microsoft.com/en-us/library/gg154758.aspx"
+            }
+        }
+    },
+    "variables": {
+	"default_tags": {
+            "Cost Center": "[parameters('kfs')]"
+        },
+	"taglist": "[if(equals(length(parameters('taglist')),0),variables('default_tags'),parameters('taglist'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.RecoveryServices/vaults",
+            "apiVersion": "2016-12-01",
+            "location": "[parameters('location')]",
+            "name": "[parameters('name')]",
+            "sku": {
+                "name": "RS0",
+                "tier": "Standard"
+            },
+            "properties": {},
+            "tags": "[variables('taglist')]"
+        },
+        {
+            "type": "Microsoft.RecoveryServices/vaults/backupstorageconfig",
+            "name": "[concat(parameters('name'), '/vaultstorageconfig')]",
+            "apiVersion": "2018-01-10",
+            "dependsOn": [
+                "[resourceId('Microsoft.RecoveryServices/vaults/', parameters('name'))]"
+            ],
+            "properties": {
+                "StorageModelType":"[parameters('vaultStorageType')]"
+            }
+        },
+        {
+            "condition": "[and(not(equals(parameters('workspace'), 'NONE')), not(equals(parameters('workspaceRG'), 'NONE')))]",
+            "type": "Microsoft.RecoveryServices/vaults/providers/diagnosticSettings",
+            "name": "[concat(parameters('name'), '/microsoft.insights/', parameters('workspace'))]",
+            "apiVersion": "2017-05-01-preview",
+            "properties": {
+                "name": "[parameters('workspace')]",
+                "workspaceId": "[resourceId(if(equals(parameters('workspaceSub'),'NONE'),json('null'),parameters('workspaceSub')), parameters('workspaceRG'), 'microsoft.operationalinsights/workspaces/', parameters('workspace'))]",
+                "logs": [
+                    {
+                        "category": "AzureBackupReport",
+                        "enabled": true
+                    }
+                ],
+                "metrics": []
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.RecoveryServices/vaults/', parameters('name'))]"
+            ]
+        },
+        {
+            "apiVersion": "2016-12-01",
+            "name": "[concat(parameters('name'), '/Daily')]",
+            "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
+            "dependsOn": [
+              "[concat('Microsoft.RecoveryServices/vaults/', parameters('name'))]"
+            ],
+            "location": "[parameters('location')]",
+            "properties": {
+              "backupManagementType": "AzureIaasVM",
+              "instantRpRetentionRangeInDays": 2,
+              "schedulePolicy": {
+                "scheduleRunFrequency": "Daily",
+                "scheduleRunDays": null,
+                "scheduleRunTimes": [
+                  "[parameters('scheduleRunTimes')]"
+                ],
+                "schedulePolicyType": "SimpleSchedulePolicy"
+              },
+              "retentionPolicy": {
+                "dailySchedule": {
+                  "retentionTimes": [
+                    "[parameters('scheduleRunTimes')]"
+                  ],
+                  "retentionDuration": {
+                    "count": 30,
+                    "durationType": "Days"
+                  }
+                },
+                "monthlySchedule": null,
+                "weeklySchedule": null,
+                "yearlySchedule": null,
+                "retentionPolicyType": "LongTermRetentionPolicy"
+              },
+              "timeZone": "[parameters('timeZone')]"
+            },
+            "tags": "[variables('taglist')]"
+        }
+    ],
+    "outputs": {
+	"backupPolicy": {
+	    "type": "string",
+	    "value": "[resourceID('Microsoft.RecoveryServices/vaults/backupPolicies', parameters('name'), 'Daily')]"
+	}
+    }
+}
