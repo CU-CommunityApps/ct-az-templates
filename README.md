@@ -13,6 +13,28 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
 ...
 ```
 
+### Referencing nested templates
+* https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-linked-templates
+
+**Use this URI to link to files in this repo**
+
+```https://raw.githubusercontent.com/CU-CommunityApps/ct-az-templates/master/<level>/<template-file-name>```
+```
+"resources": [
+  {
+    "type": "Microsoft.Resources/deployments",
+    "apiVersion": "2018-05-01",
+    "name": "linkedTemplate",
+    "properties": {
+    "mode": "Incremental",
+    "templateLink": {
+        "uri":"https://raw.githubusercontent.com/CU-CommunityApps/ct-az-templates/master/<level>/<template-file-name>",
+        "contentVersion":"1.0.0.0"
+    }
+  }
+]
+```
+
 #### [rg-level](rg-level) Resource group deployments
 * https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-template-deploy-cli
 ```
