@@ -140,7 +140,7 @@
                             "dependsOn": [
                                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
                             ],
-                            "tags": "[variables('taglist')]"
+                            "tags": "[variables('taglist')]",
                             "properties": {
                                 "etag": "*",
                                 "query": "[variables('alert').Query]",
