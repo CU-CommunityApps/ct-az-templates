@@ -17,10 +17,10 @@
         },
         "vaultStorageType": {
             "type": "string",
-            "defaultValue": "GloballyRedundant",
+            "defaultValue": "GeoRedundant",
             "allowedValues": [
               "LocallyRedundant",
-              "GloballyRedundant"
+              "GeoRedundant"
             ],
             "metadata": {
               "description": "Change Vault Storage Type (not allowed if the vault has registered backups)"
@@ -85,11 +85,11 @@
               "description": "Time of day when backup should be triggered. e.g. 23:00 or 03:00. This will be used in LTR too for daily, weekly, monthly and yearly backup."
             }
         },
-	"taglist": {
-	    "type": "object",
-	    "defaultValue": {},
-	    "metadata": "Tag object to apply to all created resources.  If not specified, we will attempt to add Cost Center based on parameter 'kfs'."
-	},
+      	"taglist": {
+      	    "type": "object",
+      	    "defaultValue": {},
+      	    "metadata": "Tag object to apply to all created resources.  If not specified, we will attempt to add Cost Center based on parameter 'kfs'."
+      	},
         "timeZone": {
             "type": "string",
             "defaultValue": "Eastern Standard Time",
@@ -105,10 +105,10 @@
         }
     },
     "variables": {
-	"default_tags": {
-            "Cost Center": "[parameters('kfs')]"
-        },
-	"taglist": "[if(equals(length(parameters('taglist')),0),variables('default_tags'),parameters('taglist'))]"
+        "default_tags": {
+                  "Cost Center": "[parameters('kfs')]"
+              },
+      	"taglist": "[if(equals(length(parameters('taglist')),0),variables('default_tags'),parameters('taglist'))]"
     },
     "resources": [
         {
@@ -131,7 +131,7 @@
                 "[resourceId('Microsoft.RecoveryServices/vaults/', parameters('name'))]"
             ],
             "properties": {
-                "StorageModelType":"[parameters('vaultStorageType')]"
+                "StorageModelType": "[parameters('vaultStorageType')]"
             }
         },
         {
