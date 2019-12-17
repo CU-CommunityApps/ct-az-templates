@@ -3,7 +3,7 @@
 ## Current Rules
 Latest Version = 1.0
 
-To update baseline NSGs in your account, select the "Deploy to Azure" button below and select your NSG resource group (default: cornell-nsg-rg)
+To update baseline NSGs in your account, select the "Deploy to Azure" button below and select your NSG resource group (default: cit-cornell-nsg-rg)
 
 ***This will update your cornell-private-nsg and cornell-public-nsg rules and could affect any resources using these NSG's, please review all updates prior to deployment.***
 
