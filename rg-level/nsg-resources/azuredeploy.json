@@ -20,7 +20,7 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2019-09-01",
       "name": "[variables('publicNSGName')]",
-      "location": "[parameters('location')]",
+      "location": "eastus",
       "tags": {
         "cit:public-nsg-version": "1.0"
       },
@@ -63,6 +63,31 @@
             }
           },
           {
+            "name": "CornellNetworksInbound",
+            "properties": {
+              "description": "Allow inbound from Cornell networks",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [
+                "128.84.0.0/16",
+                "132.236.0.0/16",
+                "128.253.0.0/16",
+                "192.122.235.0/24",
+                "10.0.0.0/8",
+                "192.35.82.0/24",
+                "192.122.236.0/24"
+              ],
+              "destinationAddressPrefixes": []
+            }
+          },
+          {
             "name": "AllowAzureLBInBound",
             "properties": {
               "description": "Allow inbound traffic from Azure Load Balancers",
@@ -132,6 +157,44 @@
             }
           },
           {
+            "name": "KerberosOutboundTCP",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "52.200.35.38/32",
+                "52.201.66.104/32"
+              ]
+            }
+          },
+          {
+            "name": "KerberosOutboundUDP",
+            "properties": {
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1300,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "52.200.35.38/32",
+                "52.201.66.104/32"
+              ]
+            }
+          },
+          {
             "name": "NTPOutbound",
             "properties": {
               "protocol": "Udp",
@@ -197,6 +260,30 @@
               "destinationPortRanges": [],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []
+            }
+          },
+          {
+            "name": "CornellNetworksOutbound",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1800,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "128.84.0.0/16",
+                "132.236.0.0/16",
+                "128.253.0.0/16",
+                "192.122.235.0/24",
+                "10.0.0.0/8",
+                "192.35.82.0/24",
+                "192.122.236.0/24"
+              ]
             }
           },
           {
@@ -223,12 +310,37 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2019-09-01",
       "name": "[variables('privateNSGName')]",
-      "location": "[parameters('location')]",
+      "location": "eastus",
       "tags": {
         "cit:private-nsg-version": "1.0"
       },
       "properties": {
         "securityRules": [
+          {
+            "name": "CornellNetworksInbound",
+            "properties": {
+              "description": "Allow inbound from Cornell networks",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [
+                "128.84.0.0/16",
+                "132.236.0.0/16",
+                "128.253.0.0/16",
+                "192.122.235.0/24",
+                "10.0.0.0/8",
+                "192.35.82.0/24",
+                "192.122.236.0/24"
+              ],
+              "destinationAddressPrefixes": []
+            }
+          },
           {
             "name": "AllowAzureLBInBound",
             "properties": {
@@ -299,6 +411,44 @@
             }
           },
           {
+            "name": "KerberosOutboundTCP",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "52.200.35.38/32",
+                "52.201.66.104/32"
+              ]
+            }
+          },
+          {
+            "name": "KerberosOutboundUDP",
+            "properties": {
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1300,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "52.200.35.38/32",
+                "52.201.66.104/32"
+              ]
+            }
+          },
+          {
             "name": "NTPOutbound",
             "properties": {
               "protocol": "Udp",
@@ -364,6 +514,30 @@
               "destinationPortRanges": [],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []
+            }
+          },
+          {
+            "name": "CornellNetworksOutbound",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1800,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "128.84.0.0/16",
+                "132.236.0.0/16",
+                "128.253.0.0/16",
+                "192.122.235.0/24",
+                "10.0.0.0/8",
+                "192.35.82.0/24",
+                "192.122.236.0/24"
+              ]
             }
           },
           {
