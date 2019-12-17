@@ -15,7 +15,7 @@
           "metadata": {
             "description": "Resource group name for CIT provided baseline NSG rules"
           }
-      },
+      }
     },
     "variables": {
       "privateNSGName": "private-nsg",
