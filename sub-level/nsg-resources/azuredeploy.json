@@ -20,7 +20,7 @@
     "variables": {
       "privateNSGName": "private-nsg",
       "publicNSGName": "public-nsg",
-      "openNSGName": "open-nsg",
+      "openNSGName": "open-nsg"
     },
     "resources": [
       {
