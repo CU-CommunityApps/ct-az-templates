@@ -11,9 +11,9 @@
     }
   },
   "variables": {
-    "privateNSGName": "private-nsg",
-    "publicNSGName": "public-nsg",
-    "openNSGName": "open-nsg"
+    "privateNSGName": "cit-cornell-private-nsg",
+    "publicNSGName": "cit-cornell-public-nsg",
+    "openNSGName": "cit-cornell-open-nsg"
   },
   "resources": [
     {
