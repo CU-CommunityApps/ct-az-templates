@@ -1,4 +1,4 @@
-name: PROD_NSG_Updates
+name: PROD_NSG_UPDATES
 
 on:
   push:
