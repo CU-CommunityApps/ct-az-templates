@@ -1,14 +1,12 @@
-name: NSG
+name: CI
 
 on: 
   push:
     branches:
       - master
-      - test
   pull_request:
     branches:
-      - master 
-      - test
+      - master
 
 jobs:
   build:
