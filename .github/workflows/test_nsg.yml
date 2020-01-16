@@ -2,7 +2,7 @@ name: TEST_NSG_UPDATES
 
 on:
   push:
-    branches: 
+    branches-ignore:
       - master
     paths:
       - 'rg-level/nsg-resources/azuredeploy.json'
