@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        repository: CU-CommunityApps/ct-az-blueprints
+        repository: CU-CommunityApps/ct-az-blueprints # Checkout separate private repo
         ref: master
         token: ${{ secrets.ACCESS_TOKEN }}
     - uses: actions/setup-python@v1
