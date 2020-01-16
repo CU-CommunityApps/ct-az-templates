@@ -1,4 +1,4 @@
-name: CI
+name: NSG_Updates
 
 on:
   push:
