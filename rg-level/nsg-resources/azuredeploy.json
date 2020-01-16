@@ -5,7 +5,7 @@
   "variables": {
     "privateNSGName": "cornell-private-nsg",
     "publicNSGName": "cornell-public-nsg",
-    "openNSGName": "cornell-open-nsg"
+    "openNSGName": "cornell-open-nsgs"
   },
   "resources": [
     {
