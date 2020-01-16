@@ -27,4 +27,4 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt        
-    - run: python update_blueprint.py ${{ secrets.TENANT_ID }} ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.MANAGEMENT_GROUP_ID }} $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
+    - run: python update_blueprint.py ${{ secrets.TENANT_ID }} ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.MANAGEMENT_GROUP_ID }}
