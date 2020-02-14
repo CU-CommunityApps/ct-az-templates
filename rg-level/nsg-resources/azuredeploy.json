@@ -279,6 +279,27 @@
             }
           },
           {
+            "name": "CornellOutboundLDAP",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1900,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": [
+                "35.170.14.255/32",
+                "3.229.3.150/32",
+                "3.228.209.25/32",
+                "3.218.140.210/32"
+              ]
+            }
+          },
+          {
             "name": "DenyAllOutbound",
             "properties": {
               "protocol": "*",
