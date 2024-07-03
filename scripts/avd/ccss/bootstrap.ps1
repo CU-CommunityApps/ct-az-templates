@@ -23,6 +23,10 @@ winget install -e --id Git.Git
 winget install -e --id GitHub.GitLFS
 # Python 3.12
 winget install -e --id Python.Python.3.12
+# TexStudio
+winget install -e --id TeXstudio.TeXstudio
+# TortoiseSVN
+winget install -e --id TortoiseSVN.TortoiseSVN
 
 # Remove Windows Bloatware
 ##Get appx Packages
