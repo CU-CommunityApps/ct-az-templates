@@ -9,7 +9,20 @@ Install-Module -Name Microsoft.WinGet.Client -Force
 # Reset Windows Terminal
 Get-AppxPackage Microsoft.WindowsTerminal | Reset-AppPackage
 
+# Reset profile session
+. $profile
+
 # Install Basic WinGet Packages
+# 7zip
+winget install -e --id mcmilk.7zip-zstd
+# Notepad++
+winget install -e --id Notepad++.Notepad++
+# Git
+winget install -e --id Git.Git
+# Git LFS
+winget install -e --id GitHub.GitLFS
+# Python 3.12
+winget install -e --id Python.Python.3.12
 
 # Remove Windows Bloatware
 ##Get appx Packages
@@ -34,7 +47,8 @@ $AllowList = @(
     '*Microsoft.RawImageExtension*',
     '*Microsoft.VP9VideoExtensions*',
     '*Microsoft.WebMediaExtensions*',
-    '*Microsoft.WebpImageExtension*'
+    '*Microsoft.WebpImageExtension*',
+    '*Microsoft.WindowsAppRuntime*'
 )
 
 ###Get All Dependencies
