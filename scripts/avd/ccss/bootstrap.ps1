@@ -14,14 +14,14 @@ try {
     Write-Output "Failed to install NuGet: $_"  
 }  
   
-# Install WinGet  
-try {  
-    Install-Module -Name Microsoft.WinGet.Client -Force -Verbose
-    Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -Verbose
-    Write-Output "WinGet installed successfully."  
-} catch {  
-    Write-Output "Failed to install WinGet: $_"  
-}  
+# # Install WinGet  
+# try {  
+#     Install-Module -Name Microsoft.WinGet.Client -Force -Verbose
+#     Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -Verbose
+#     Write-Output "WinGet installed successfully."  
+# } catch {  
+#     Write-Output "Failed to install WinGet: $_"  
+# }  
   
 # Reset Windows Terminal  
 try {  
@@ -32,6 +32,13 @@ try {
 }
 
 # Install Basic WinGet Packages
+# Locate winget.exe
+try {
+    $winget = (Resolve-Path "$env:ProgramFiles\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe").Path + "\winget.exe"
+} catch {
+    Write-Output "Failed to find winget.exe: $_"
+}
+
 # Function to install a WinGet package and log results  
 function Install-WinGetPackage {  
     param (  
@@ -39,7 +46,7 @@ function Install-WinGetPackage {
     )  
     try {  
         Write-Output "Installing package $packageId..."  
-        winget install -e --id $packageId --accept-source-agreements --accept-package-agreements --verbose-logs  
+        $winget install -e --id $packageId --accept-source-agreements --accept-package-agreements --scope 'machine' --verbose-logs  
         Write-Output "Installed package $packageId successfully."  
     } catch {  
         Write-Output "Failed to install package ${packageId}: $_"  
@@ -61,7 +68,7 @@ $packages = @(
 # Loop through each package and install it  
 foreach ($package in $packages) {  
     Install-WinGetPackage -packageId $package  
-}  
+}
 
 # Remove Windows Bloatware
 ##Get appx Packages
