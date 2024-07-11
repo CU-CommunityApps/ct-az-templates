@@ -1,35 +1,67 @@
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-# Install NuGet
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-
-# Install WinGet
-Install-Module -Name Microsoft.WinGet.Client -Force
-Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
-
-# Reset Windows Terminal
-Get-AppxPackage Microsoft.WindowsTerminal -AllUsers | Reset-AppPackage
-
-# Reset profile session
-. $profile
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12  
+  
+# Define the log file path  
+$logFile = "C:\bootstrap.log"  
+  
+# Start logging everything to the transcript file  
+Start-Transcript -Path $logFile -Append
+    
+# Install NuGet  
+try {  
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Verbose
+    Write-Output "NuGet installed successfully."  
+} catch {  
+    Write-Output "Failed to install NuGet: $_"  
+}  
+  
+# Install WinGet  
+try {  
+    Install-Module -Name Microsoft.WinGet.Client -Force -Verbose
+    Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -Verbose
+    Write-Output "WinGet installed successfully."  
+} catch {  
+    Write-Output "Failed to install WinGet: $_"  
+}  
+  
+# Reset Windows Terminal  
+try {  
+    Get-AppxPackage Microsoft.WindowsTerminal -AllUsers | Reset-AppPackage -Verbose
+    Write-Output "Windows Terminal reset successfully."  
+} catch {  
+    Write-Output "Failed to reset Windows Terminal: $_"  
+}
 
 # Install Basic WinGet Packages
-# Microsoft.WindowsAppRuntime.1.5
-winget install -e --id Microsoft.WindowsAppRuntime.1.5 --accept-source-agreements --accept-package-agreements
-# 7zip
-winget install -e --id mcmilk.7zip-zstd --accept-source-agreements --accept-package-agreements
-# Notepad++
-winget install -e --id Notepad++.Notepad++ --accept-source-agreements --accept-package-agreements
-# Git
-winget install -e --id Git.Git --accept-source-agreements --accept-package-agreements
-# Git LFS
-winget install -e --id GitHub.GitLFS --accept-source-agreements --accept-package-agreements
-# Python 3.12
-winget install -e --id Python.Python.3.12 --accept-source-agreements --accept-package-agreements
-# TexStudio
-winget install -e --id TeXstudio.TeXstudio --accept-source-agreements --accept-package-agreements
-# TortoiseSVN
-winget install -e --id TortoiseSVN.TortoiseSVN --accept-source-agreements --accept-package-agreements
+# Function to install a WinGet package and log results  
+function Install-WinGetPackage {  
+    param (  
+        [string]$packageId  
+    )  
+    try {  
+        Write-Output "Installing package $packageId..."  
+        winget install -e --id $packageId --accept-source-agreements --accept-package-agreements --verbose-logs  
+        Write-Output "Installed package $packageId successfully."  
+    } catch {  
+        Write-Output "Failed to install package ${packageId}: $_"  
+    }  
+}  
+
+# List of WinGet package IDs  
+$packages = @(  
+    "Microsoft.WindowsAppRuntime.1.5",  
+    "mcmilk.7zip-zstd",  
+    "Notepad++.Notepad++",  
+    "Git.Git",  
+    "GitHub.GitLFS",  
+    "Python.Python.3.12",  
+    "TeXstudio.TeXstudio",  
+    "TortoiseSVN.TortoiseSVN"  
+)  
+
+# Loop through each package and install it  
+foreach ($package in $packages) {  
+    Install-WinGetPackage -packageId $package  
+}  
 
 # Remove Windows Bloatware
 ##Get appx Packages
@@ -79,6 +111,9 @@ ForEach($App in $Packages){
     }
     ###Nonremovable attribute does not exist before 1809, so if you are running this on an earlier build, remove “-and $app.NonRemovable -eq $false” rt; it attempts to remove everything
     if($matched -eq $false -and $app.NonRemovable -eq $false){
-        Get-AppxPackage -AllUsers -Name $App.Name -PackageTypeFilter Bundle | Remove-AppxPackage -AllUsers
+        Get-AppxPackage -AllUsers -Name $App.Name -PackageTypeFilter Bundle | Remove-AppxPackage -AllUsers -Verbose
     }
 }
+
+# Stop the transcript  
+Stop-Transcript 
