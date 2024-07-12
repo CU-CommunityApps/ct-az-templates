@@ -1,18 +1,36 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12  
   
 # Define the log file path  
-$logFile = "C:\bootstrap.log"  
+$logFile = "C:\bootstrap.log"
   
 # Start logging everything to the transcript file  
 Start-Transcript -Path $logFile -Append
     
 # Install NuGet  
-try {  
+try {
+    mkdir "$Env:ProgramFiles\NuGet" -Force -Verbose
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Verbose
-    Write-Output "NuGet installed successfully."  
+    Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "$Env:ProgramFiles\NuGet\nuget.exe" -Verbose
+    Write-Output "NuGet installed successfully."
 } catch {  
     Write-Output "Failed to install NuGet: $_"  
-}  
+}
+
+# # Install dotnet
+# try {
+#     Write-Output "Installing dotnet"
+#     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://dot.net/v1/dotnet-install.ps1'))
+# } catch {
+#     Write-Output "Failed to install dotnet: $_"
+# }
+
+# # Install Chocolatey
+# try {
+#     Write-Output "Installing Chocolatey"
+#     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+# } catch {
+#     Write-Output "Failed to install Chocolatey: $_"
+# }
   
 # # Install WinGet  
 # try {  
@@ -31,22 +49,16 @@ try {
     Write-Output "Failed to reset Windows Terminal: $_"  
 }
 
-# Install Basic WinGet Packages
-# Locate winget.exe
-try {
-    $winget = (Resolve-Path "$env:ProgramFiles\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe").Path + "\winget.exe"
-} catch {
-    Write-Output "Failed to find winget.exe: $_"
-}
+# Install Basic Utility Packages
 
-# Function to install a WinGet package and log results  
-function Install-WinGetPackage {  
+# Function to install a choco package and log results  
+function Install-NugetPackage {  
     param (  
         [string]$packageId  
     )  
     try {  
         Write-Output "Installing package $packageId..."  
-        Start-Process $winget -ArgumentList "install -e --id $packageId --accept-source-agreements --accept-package-agreements --scope 'machine' --verbose-logs" -Wait
+        Start-Process -FilePath "$Env:ProgramFiles\NuGet\nuget.exe" -ArgumentList "install $packageId -OutputDirectory $env:ProgramFiles -Verbosity detailed" -NoNewWindow -Wait -Verbose
         Write-Output "Installed package $packageId successfully."  
     } catch {  
         Write-Output "Failed to install package ${packageId}: $_"  
@@ -55,19 +67,18 @@ function Install-WinGetPackage {
 
 # List of WinGet package IDs  
 $packages = @(  
-    "Microsoft.WindowsAppRuntime.1.5",  
-    "mcmilk.7zip-zstd",  
-    "Notepad++.Notepad++",  
-    "Git.Git",  
-    "GitHub.GitLFS",  
-    "Python.Python.3.12",  
-    "TeXstudio.TeXstudio",  
-    "TortoiseSVN.TortoiseSVN"  
+    "Microsoft.WindowsAppSDK",  
+    # "7zip",
+    # "notepadplusplus",
+    "GitForWindows",
+    "python",
+    # "texstudio",
+    # "tortoisesvn"
 )  
 
 # Loop through each package and install it  
 foreach ($package in $packages) {  
-    Install-WinGetPackage -packageId $package  
+    Install-NugetPackage -packageId $package
 }
 
 # Remove Windows Bloatware
@@ -79,14 +90,14 @@ $AllowList = @(
     '*WindowsCalculator*',
     '*Office.OneNote*',
     '*Microsoft.net*',
-    '*MicrosoftEdge*',
+    # '*MicrosoftEdge*',
     '*WindowsStore*',
     '*WindowsTerminal*',
     '*WindowsNotepad*',
     '*Paint*',
     '*Microsoft.PowerAutomateDesktop*',
     '*Microsoft.CompanyPortal*',
-    '*Microsoft.WindowsMaps*',
+    # '*Microsoft.WindowsMaps*',
     '*Microsoft.Windows.Photos*',
     '*Microsoft.HEIFImageExtension*',
     '*Microsoft.HEVCVideoExtension*',
