@@ -46,7 +46,7 @@ function Install-WinGetPackage {
     )  
     try {  
         Write-Output "Installing package $packageId..."  
-        $winget install -e --id $packageId --accept-source-agreements --accept-package-agreements --scope 'machine' --verbose-logs  
+        Start-Process $winget -ArgumentList "install -e --id $packageId --accept-source-agreements --accept-package-agreements --scope 'machine' --verbose-logs" -Wait
         Write-Output "Installed package $packageId successfully."  
     } catch {  
         Write-Output "Failed to install package ${packageId}: $_"  
