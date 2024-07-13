@@ -71,7 +71,7 @@ $packages = @(
     # "7zip",
     # "notepadplusplus",
     "GitForWindows",
-    "python",
+    "python"
     # "texstudio",
     # "tortoisesvn"
 )  
