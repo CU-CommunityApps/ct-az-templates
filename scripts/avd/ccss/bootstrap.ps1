@@ -8,9 +8,9 @@ Start-Transcript -Path $logFile -Append
     
 # Install NuGet  
 try {
-    mkdir "$Env:ProgramFiles\NuGet" -Force -Verbose
+    # mkdir "$Env:ProgramFiles\NuGet" -Force -Verbose
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Verbose
-    Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "$Env:ProgramFiles\NuGet\nuget.exe" -Verbose
+    # Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "$Env:ProgramFiles\NuGet\nuget.exe" -Verbose
     Write-Output "NuGet installed successfully."
 } catch {  
     Write-Output "Failed to install NuGet: $_"  
@@ -51,14 +51,22 @@ try {
 
 # Install Basic Utility Packages
 
-# Function to install a choco package and log results  
-function Install-NugetPackage {  
+# Function to install a package and log results  
+function Install-Package {  
     param (  
-        [string]$packageId  
+        [string]$packageId,
+        [string]$URL,
+        [string]$installParams
     )  
-    try {  
-        Write-Output "Installing package $packageId..."  
-        Start-Process -FilePath "$Env:ProgramFiles\NuGet\nuget.exe" -ArgumentList "install $packageId -OutputDirectory $env:ProgramFiles -Verbosity detailed" -NoNewWindow -Wait -Verbose
+    try {
+        Write-Output "Downloading package $packageId..."
+        Start-BitsTransfer -Source $URL -Destination "$env:temp" -Verbose
+        Write-Output "Installing package $packageId..."
+        If ($URL.EndsWith(".msi")){Start-Process "msiexec.exe" -ArgumentList "/i $env:temp\$($url.Split("/")[-1]) /norestart /qn" -Wait}
+        ElseIf ($URL.EndsWith(".exe")){Start-Process "$env:temp\$($url.Split("/")[-1])" -ArgumentList "$installParams" -Wait}
+        Else {Write-Output "Incompatible installer file"}
+        #cd "$env:ProgramFiles\NuGet"
+        #.\nuget.exe install $packageId -Source "https://api.nuget.org/v3/index.json" -Verbosity detailed
         Write-Output "Installed package $packageId successfully."  
     } catch {  
         Write-Output "Failed to install package ${packageId}: $_"  
@@ -66,19 +74,47 @@ function Install-NugetPackage {
 }  
 
 # List of WinGet package IDs  
-$packages = @(  
-    "Microsoft.WindowsAppSDK",  
-    # "7zip",
-    # "notepadplusplus",
+<#$packages = @(  
+    "Microsoft.WindowsAppSDK",
+    "7zip",
+    "notepadplusplus",
     "GitForWindows",
     "python"
-    # "texstudio",
-    # "tortoisesvn"
-)  
+    "texstudio",
+    "tortoisesvn"
+)#> 
+
+$packages = @(
+    @{
+        packageId = "Microsoft.WindowsAppSDK"
+        URL = "https://aka.ms/windowsappsdk/1.5/1.5.240627000/windowsappruntimeinstall-x64.exe"
+        installParams = "--quiet --force --msix"
+    },
+    @{
+        packageId = "7zip"
+        URL = "https://www.7-zip.org/$((iwr -Uri "https://www.7-zip.org/download.html" -UseBasicParsing | Select -ExpandProperty Links | Where -Property href -like "*-x64.msi")[0].href)"
+        installParams = ""
+    },
+    @{
+        packageId = "NotePad++"
+        URL = $(((iwr -URI $("https://notepad-plus-plus.org$(((iwr -Uri "https://notepad-plus-plus.org"-UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "/downloads/v*").href)") -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "*npp.*.installer.x64.exe").href | Select -Index 0)
+        installParams = "/S"
+    },
+    @{
+        packageId = "Python"
+        URL = "https://www.python.org/ftp/python/3.12.4/python-3.12.4.exe"
+        installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
+    },
+    @{
+        packageId = "Git"
+        URL = "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe"
+        installParams = "/VERYSILENT /NORESTART"
+    }
+)
 
 # Loop through each package and install it  
 foreach ($package in $packages) {  
-    Install-NugetPackage -packageId $package
+    Install-Package -packageId $package.packageId -URL $package.URL -installParams $package.installParams
 }
 
 # Remove Windows Bloatware
@@ -134,4 +170,4 @@ ForEach($App in $Packages){
 }
 
 # Stop the transcript  
-Stop-Transcript 
+Stop-Transcript
