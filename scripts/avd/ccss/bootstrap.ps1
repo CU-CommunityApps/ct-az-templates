@@ -167,5 +167,17 @@ ForEach($App in $Packages){
     }
 }
 
+# Copy icon and create shortcut
+Start-BitsTransfer -Source "https://raw.githubusercontent.com/CU-CommunityApps/ct-az-templates/master/scripts/avd/ccss/signout.ico" -Destination "$env:windir\system32\signout.ico" -Verbose
+
+# Create executable shortcut
+$shell = New-Object -comObject WScript.Shell
+$shortcut = $WshShell.CreateShortcut("$env:public\desktop\Sign out.lnk")
+$shortcut.TargetPath = "powershell.exe"
+$shortcut.Arguments =  "-Command `"logoff`""
+$shortcut.IconLocation = "$env:windir\system32\signout.ico"
+$shortcut.WindowStyle = 7
+$shortcut.Save()
+
 # Stop the transcript  
 Stop-Transcript
