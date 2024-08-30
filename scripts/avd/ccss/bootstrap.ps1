@@ -172,7 +172,7 @@ Start-BitsTransfer -Source "https://raw.githubusercontent.com/CU-CommunityApps/c
 
 # Create executable shortcut
 $shell = New-Object -comObject WScript.Shell
-$shortcut = $WshShell.CreateShortcut("$env:public\desktop\Sign out.lnk")
+$shortcut = $shell.CreateShortcut("$env:public\desktop\Sign out.lnk")
 $shortcut.TargetPath = "powershell.exe"
 $shortcut.Arguments =  "-Command `"logoff`""
 $shortcut.IconLocation = "$env:windir\system32\signout.ico"
