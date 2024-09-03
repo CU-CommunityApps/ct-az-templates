@@ -187,54 +187,13 @@ Function Set-RegistryValue {
 
 # Registry updates to be performed
 $registryUpdates = @(
-    # Disable Windows Copilot
-    @{
-        Path  = "HKUD:\Software\Policies\Microsoft\Windows\WindowsCopilot"
-        Name  = "TurnOffWindowsCopilot"
-        Value = 1
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\Software\Policies\Microsoft\Windows\WindowsCopilot"
-        Name  = "TurnOffWindowsCopilot"
-        Value = 1
-        Type  = "DWord"
-    },
     # Enable Kerberos ticket retrieval for Azure Files
     @{
         Path  = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
         Name  = "CloudKerberosTicketRetrievalEnabled"
         Value = 1
         Type  = "DWord"
-    },
-    # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
-    @{
-        Path  = "HKUD:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
-        Name  = "PreInstalledAppsEnabled"
-        Value = "0"
-        Type  = "DWord"
     }
-    # Set default terminal app to Windows Terminal
-    @{
-        Path  = "HKUD:\Console\%%Startup"
-        Name  = "DelegationConsole"
-        Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
-        Type  = "String"
-    }
-    @{
-        Path  = "HKUD:\Console\%%Startup"
-        Name  = "DelegationTerminal"
-        Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
-        Type  = "String"
-    }
-    # Set desktop wallpaper style
-    @{
-        Path  = "HKUD:\Control Panel\Desktop"
-        Name  = "WallpaperStyle"
-        Value = "6" # 6 = fit
-        Type  = "String"
-    }
-    # Add additional hashtable objects here for future updates
 )
 
 foreach ($update in $registryUpdates) {
