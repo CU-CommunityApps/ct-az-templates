@@ -173,7 +173,7 @@ Function Set-RegistryValue {
         [Parameter(Mandatory = $true)] [String] $Path,
         [Parameter(Mandatory = $true)] [String] $Name,
         [Parameter(Mandatory = $true)] $Value,
-        [Parameter(Mandatory = $true)] [String] $Type,
+        [Parameter(Mandatory = $true)] [String] $Type
     )
     
     # Check if the registry path exists; if not, create it
