@@ -212,5 +212,8 @@ $shortcut.IconLocation = "$env:windir\system32\signout.ico"
 $shortcut.WindowStyle = 7
 $shortcut.Save()
 
+# Copy background image
+Start-BitsTransfer -Source "https://raw.githubusercontent.com/CU-CommunityApps/ct-az-templates/master/scripts/avd/ccss/CCSS_Cloud_Computing_Screen.jpg" -Destination "$env:windir\Web\Wallpaper\Windows\img0.jpg" -Verbose
+
 # Stop the transcript  
 Stop-Transcript
