@@ -239,6 +239,12 @@ $registryUpdates = @(
         Name  = "WallpaperStyle"
         Value = "3" # 3 = fit
         Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        Name  = "WallpaperStyle"
+        Value = "3" # 3 = fit
+        Type  = "String"
     }
 )
 
