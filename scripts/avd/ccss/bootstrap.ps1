@@ -225,7 +225,19 @@ $registryUpdates = @(
     @{
         Path  = "Registry::HKEY_USERS\.DEFAULT\Control Panel\Desktop"
         Name  = "WallpaperStyle"
-        Value = "6" # 6 = fit
+        Value = "3" # 3 = fit
+        Type  = "String"
+    },
+    @{
+        Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        Name  = "WallpaperStyle"
+        Value = "3" # 3 = fit
+        Type  = "String"
+    },
+    @{
+        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        Name  = "WallpaperStyle"
+        Value = "3" # 3 = fit
         Type  = "String"
     }
 )
