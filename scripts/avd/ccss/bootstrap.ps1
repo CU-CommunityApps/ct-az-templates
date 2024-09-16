@@ -87,7 +87,7 @@ function Install-Package {
 $packages = @(
     @{
         packageId = "Microsoft.WindowsAppSDK"
-        URL = "https://aka.ms/windowsappsdk/1.5/1.5.240627000/windowsappruntimeinstall-x64.exe"
+        URL = "https://aka.ms/windowsappsdk/1.4/1.4.240802001/windowsappruntimeinstall-x64.exe"
         installParams = "--quiet --force --msix"
     },
     @{
@@ -97,7 +97,7 @@ $packages = @(
     },
     @{
         packageId = "NotePad++"
-        URL = $(((iwr -URI $("https://notepad-plus-plus.org$(((iwr -Uri "https://notepad-plus-plus.org"-UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "/downloads/v*").href)") -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "*npp.*.installer.x64.exe").href | Select -Index 0)
+        URL = $(((iwr -URI $("https://notepad-plus-plus.org$(((iwr -Uri "https://notepad-plus-plus.org" -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "/downloads/v*").href)") -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "*npp.*.installer.x64.exe").href | Select -Index 0)
         installParams = "/S"
     },
     @{
@@ -222,12 +222,12 @@ $registryUpdates = @(
         Type  = "String"
     },
     # Set desktop wallpaper stlye to "Fit"
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Control Panel\Desktop"
-        Name  = "WallpaperStyle"
-        Value = "3" # 3 = fit
-        Type  = "String"
-    },
+    # @{
+    #     Path  = "Registry::HKEY_USERS\.DEFAULT\Control Panel\Desktop"
+    #     Name  = "WallpaperStyle"
+    #     Value = "3" # 3 = fit
+    #     Type  = "String"
+    # },
     @{
         Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\System"
         Name  = "WallpaperStyle"
