@@ -109,6 +109,11 @@ $packages = @(
         packageId = "Git"
         URL = "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe"
         installParams = "/VERYSILENT /NORESTART"
+    },
+    @{
+        packageId = "JAGS"
+        URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
+        installParams = "/S"
     }
 )
 
