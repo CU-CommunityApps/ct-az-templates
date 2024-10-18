@@ -91,6 +91,11 @@ $packages = @(
         installParams = "--quiet --force --msix"
     },
     @{
+        packageId = "Microsoft Windows Desktop Runtime"
+        URL = "https://download.visualstudio.microsoft.com/download/pr/f398d462-9d4e-4b9c-abd3-86c54262869a/4a8e3a10ca0a9903a989578140ef0499/windowsdesktop-runtime-8.0.10-win-x64.exe"
+        installParams = "/install /quiet /norestart"
+    },
+    @{
         packageId = "7zip"
         URL = "https://www.7-zip.org/$((iwr -Uri "https://www.7-zip.org/download.html" -UseBasicParsing | Select -ExpandProperty Links | Where -Property href -like "*-x64.msi")[0].href)"
         installParams = ""
