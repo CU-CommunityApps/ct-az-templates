@@ -124,7 +124,7 @@ $packages = @(
         packageId = "Anaconda"
         URL = "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Windows-x86_64.exe"
         installParams = "/S /InstallationType=AllUsers /AddToPath=1 /RegisterPython=1 /D=%ProgramFiles%\Anaconda"
-    },
+    }
 )
 
 # Loop through each package and install it  
