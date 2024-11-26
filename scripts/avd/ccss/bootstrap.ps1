@@ -119,12 +119,12 @@ $packages = @(
         packageId = "JAGS"
         URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
         installParams = "/S"
-    },
-    @{
-        packageId = "Anaconda"
-        URL = "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Windows-x86_64.exe"
-        installParams = "/S /InstallationType=AllUsers /AddToPath=1 /RegisterPython=1 /D=%ProgramFiles%\Anaconda"
     }
+    # @{
+    #     packageId = "Anaconda"
+    #     URL = "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Windows-x86_64.exe"
+    #     installParams = "/S /InstallationType=AllUsers /AddToPath=1 /RegisterPython=1 /D=%ProgramFiles%\Anaconda"
+    # }
 )
 
 # Loop through each package and install it  
@@ -259,6 +259,12 @@ $registryUpdates = @(
         Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
         Name  = "WallpaperStyle"
         Value = "3" # 3 = fit
+        Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "SIDDirNamePattern"
+        Value = "%username%" # use netID only
         Type  = "String"
     }
 )
