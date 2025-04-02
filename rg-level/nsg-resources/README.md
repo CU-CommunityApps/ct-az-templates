@@ -3,7 +3,7 @@
 ## Current Rules
 Latest Version = 1.1
 
-[Current Rules](https://confluence.cornell.edu/display/CLOUD/Cornell+Network+Security+Groups)
+[Current Rules](https://confluence.cornell.edu/display/CLOUD/Cornell+Azure+Network+Security+Groups)
 
 To update baseline NSGs in your account, select the "Deploy to Azure" button below and select your NSG resource group (default: cit-cornell-nsg-rg)
 
