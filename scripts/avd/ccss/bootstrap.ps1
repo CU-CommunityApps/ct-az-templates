@@ -269,7 +269,19 @@ $registryUpdates = @(
     },
     @{
         Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "SIDDirNameMatch"
+        Value = "%username%" # use netID only
+        Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "VHDNamePattern"
+        Value = "%username%" # use netID only
+        Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "VHDNameMatch"
         Value = "%username%" # use netID only
         Type  = "String"
     }
