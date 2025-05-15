@@ -42,12 +42,12 @@ try {
 # }  
   
 # Reset Windows Terminal  
-try {  
-    Get-AppxPackage Microsoft.WindowsTerminal -AllUsers | Reset-AppPackage -Verbose
-    Write-Output "Windows Terminal reset successfully."  
-} catch {  
-    Write-Output "Failed to reset Windows Terminal: $_"  
-}
+# try {  
+#     Get-AppxPackage Microsoft.WindowsTerminal -AllUsers | Reset-AppPackage -Verbose
+#     Write-Output "Windows Terminal reset successfully."  
+# } catch {  
+#     Write-Output "Failed to reset Windows Terminal: $_"  
+# }
 
 # Install Basic Utility Packages
 
