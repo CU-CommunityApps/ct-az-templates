@@ -85,16 +85,16 @@ function Install-Package {
 )#> 
 
 $packages = @(
-    @{
-        packageId = "Microsoft.WindowsAppSDK"
-        URL = "https://aka.ms/windowsappsdk/1.4/1.4.240802001/windowsappruntimeinstall-x64.exe"
-        installParams = "--quiet --force --msix"
-    },
-    @{
-        packageId = "Microsoft Windows Desktop Runtime"
-        URL = "https://download.visualstudio.microsoft.com/download/pr/f1e7ffc8-c278-4339-b460-517420724524/f36bb75b2e86a52338c4d3a90f8dac9b/windowsdesktop-runtime-8.0.12-win-x64.exe"
-        installParams = "/install /quiet /norestart"
-    },
+    # @{
+    #     packageId = "Microsoft.WindowsAppSDK"
+    #     URL = "https://aka.ms/windowsappsdk/1.4/1.4.240802001/windowsappruntimeinstall-x64.exe"
+    #     installParams = "--quiet --force --msix"
+    # },
+    # @{
+    #     packageId = "Microsoft Windows Desktop Runtime"
+    #     URL = "https://download.visualstudio.microsoft.com/download/pr/f1e7ffc8-c278-4339-b460-517420724524/f36bb75b2e86a52338c4d3a90f8dac9b/windowsdesktop-runtime-8.0.12-win-x64.exe"
+    #     installParams = "/install /quiet /norestart"
+    # },
     @{
         packageId = "7zip"
         URL = "https://www.7-zip.org/$((iwr -Uri "https://www.7-zip.org/download.html" -UseBasicParsing | Select -ExpandProperty Links | Where -Property href -like "*-x64.msi")[0].href)"
@@ -132,55 +132,55 @@ foreach ($package in $packages) {
     Install-Package -packageId $package.packageId -URL $package.URL -installParams $package.installParams
 }
 
-# Remove Windows Bloatware
-##Get appx Packages
-$Packages = Get-AppxPackage
+# # Remove Windows Bloatware
+# ##Get appx Packages
+# $Packages = Get-AppxPackage
 
-##Create Your allowlist
-$AllowList = @(
-    '*WindowsCalculator*',
-    '*Office.OneNote*',
-    '*Microsoft.net*',
-    '*WindowsStore*',
-    '*WindowsTerminal*',
-    '*WindowsNotepad*',
-    '*Paint*',
-    '*Microsoft.PowerAutomateDesktop*',
-    '*Microsoft.CompanyPortal*',
-    '*Microsoft.Windows.Photos*',
-    '*Microsoft.HEIFImageExtension*',
-    '*Microsoft.HEVCVideoExtension*',
-    '*Microsoft.RawImageExtension*',
-    '*Microsoft.VP9VideoExtensions*',
-    '*Microsoft.WebMediaExtensions*',
-    '*Microsoft.WebpImageExtension*',
-    '*Microsoft.WindowsAppRuntime*'
-)
+# ##Create Your allowlist
+# $AllowList = @(
+#     '*WindowsCalculator*',
+#     '*Office.OneNote*',
+#     '*Microsoft.net*',
+#     '*WindowsStore*',
+#     '*WindowsTerminal*',
+#     '*WindowsNotepad*',
+#     '*Paint*',
+#     '*Microsoft.PowerAutomateDesktop*',
+#     '*Microsoft.CompanyPortal*',
+#     '*Microsoft.Windows.Photos*',
+#     '*Microsoft.HEIFImageExtension*',
+#     '*Microsoft.HEVCVideoExtension*',
+#     '*Microsoft.RawImageExtension*',
+#     '*Microsoft.VP9VideoExtensions*',
+#     '*Microsoft.WebMediaExtensions*',
+#     '*Microsoft.WebpImageExtension*',
+#     '*Microsoft.WindowsAppRuntime*'
+# )
 
-###Get All Dependencies
-ForEach($Dependency in $AllowList){
-    (Get-AppxPackage  -Name “$Dependency”).dependencies | ForEach-Object{
-        $NewAdd = "*" + $_.Name + "*"
-        if($_.name -ne $null -and $AllowList -notcontains $NewAdd){
-            $AllowList += $NewAdd
-       }
-    }
-}
+# ###Get All Dependencies
+# ForEach($Dependency in $AllowList){
+#     (Get-AppxPackage  -Name “$Dependency”).dependencies | ForEach-Object{
+#         $NewAdd = "*" + $_.Name + "*"
+#         if($_.name -ne $null -and $AllowList -notcontains $NewAdd){
+#             $AllowList += $NewAdd
+#        }
+#     }
+# }
 
-##View all applications not in your allowlist
-ForEach($App in $Packages){
-    $Matched = $false
-    Foreach($Item in $AllowList){
-        If($App -like $Item){
-            $Matched = $true
-            break
-        }
-    }
-    ###Nonremovable attribute does not exist before 1809, so if you are running this on an earlier build, remove “-and $app.NonRemovable -eq $false” rt; it attempts to remove everything
-    if($matched -eq $false -and $app.NonRemovable -eq $false){
-        Get-AppxPackage -AllUsers -Name $App.Name -PackageTypeFilter Bundle | Remove-AppxPackage -AllUsers -Verbose
-    }
-}
+# ##View all applications not in your allowlist
+# ForEach($App in $Packages){
+#     $Matched = $false
+#     Foreach($Item in $AllowList){
+#         If($App -like $Item){
+#             $Matched = $true
+#             break
+#         }
+#     }
+#     ###Nonremovable attribute does not exist before 1809, so if you are running this on an earlier build, remove “-and $app.NonRemovable -eq $false” rt; it attempts to remove everything
+#     if($matched -eq $false -and $app.NonRemovable -eq $false){
+#         Get-AppxPackage -AllUsers -Name $App.Name -PackageTypeFilter Bundle | Remove-AppxPackage -AllUsers -Verbose
+#     }
+# }
 
 # Create Default User Profile registry settings
 Function Set-RegistryValue {
