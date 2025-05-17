@@ -107,12 +107,12 @@ $packages = @(
     },
     @{
         packageId = "Python"
-        URL = "https://www.python.org/ftp/python/3.12.4/python-3.12.4.exe"
+        URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
         installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
     },
     @{
         packageId = "Git"
-        URL = "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe"
+        URL = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
         installParams = "/VERYSILENT /NORESTART"
     },
     @{
@@ -120,11 +120,6 @@ $packages = @(
         URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
         installParams = "/S"
     }
-    # @{
-    #     packageId = "Anaconda"
-    #     URL = "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Windows-x86_64.exe"
-    #     installParams = "/S /InstallationType=AllUsers /AddToPath=1 /RegisterPython=1 /D=%ProgramFiles%\Anaconda"
-    # }
 )
 
 # Loop through each package and install it  
