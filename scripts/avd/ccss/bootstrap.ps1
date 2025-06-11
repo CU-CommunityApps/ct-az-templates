@@ -103,23 +103,23 @@ $packages = @(
     @{
         packageId = "NotePad++"
         URL = $(((iwr -URI $("https://notepad-plus-plus.org$(((iwr -Uri "https://notepad-plus-plus.org" -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "/downloads/v*").href)") -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "*npp.*.installer.x64.exe").href | Select -Index 0)
-        installParams = "/S"
-    },
-    @{
-        packageId = "Python"
-        URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
-        installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
-    },
-    @{
-        packageId = "Git"
-        URL = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
-        installParams = "/VERYSILENT /NORESTART"
-    },
-    @{
-        packageId = "JAGS"
-        URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
-        installParams = "/S"
+        installParams = "/S /noUpdater"
     }
+    # @{
+    #     packageId = "Python"
+    #     URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
+    #     installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
+    # },
+    # @{
+    #     packageId = "Git"
+    #     URL = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
+    #     installParams = "/VERYSILENT /NORESTART"
+    # },
+    # @{
+    #     packageId = "JAGS"
+    #     URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
+    #     installParams = "/S"
+    # }
 )
 
 # Loop through each package and install it  
