@@ -95,7 +95,7 @@ $registryUpdates = @(
     @{
         Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptIn"
-        Value = "0" # Tenant ID (CHECKING IF SENSITIVE)
+        Value = "0" # Tenant ID (CHECKING IF SENSITIVE) Use this setting to redirect and move your users' Documents, Pictures, and/or Desktop folders to OneDrive without any user interaction.
         Type  = "String"
     },
     @{
