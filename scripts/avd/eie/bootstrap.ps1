@@ -121,6 +121,12 @@ $registryUpdates = @(
         Name  = "KFMSilentOptInPictures"
         Value = "1" # Automatically move the Pictures folder to OneDrive without prompting the user
         Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "FilesOnDemandEnabled"
+        Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
+        Type  = "DWord"
     }
 )
 
