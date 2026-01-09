@@ -1,3 +1,8 @@
+param(
+    [Parameter(Mandatory = $true)] [string] $FslogixStorageAccountPath,
+    [Parameter(Mandatory = $true)] [string] $TenantId
+)
+
 # Create Default User Profile registry settings
 Function Set-RegistryValue {
     Param (
@@ -85,17 +90,17 @@ $registryUpdates = @(
         Name  = "PreventLoginWithTempProfile"
         Value = "1" # Prevent user login when a user receives a temporary Windows profile
         Type  = "DWord"
-    }.
+    },
     @{
         Path  = "HKLM\SOFTWARE\FSLogix\Profiles"
         Name  = "VHDLocations"
-        Value = "FSLogixStorageAccountPATH" # The location where FSLogix Profile VHDs are stored (CHECKING IF SENSITIVE)
+        Value = $FslogixStorageAccountPath # The location where FSLogix Profile VHDs are stored
         Type  = "String"
     },
     @{
         Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptIn"
-        Value = "0" # Tenant ID (CHECKING IF SENSITIVE)
+        Value = $TenantId # Tenant ID
         Type  = "String"
     },
     @{
