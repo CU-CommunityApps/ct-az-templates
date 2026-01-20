@@ -62,73 +62,79 @@ $registryUpdates = @(
         Type  = "String"
     },
     @{
-        Path  = "HKLM\SOFTWARE\FSLogix\Apps"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Apps"
         Name  = "CleanupInvalidSessions"
         Value = "1" # Cleans out registry keys in the HKEY_LOCAL_MACHINE hive that refer to a users SID. 
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\FSLogix\Profiles"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "Enabled"
         Value = "1" # Controls whether or not the Profiles feature is active 
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\FSLogix\Profiles"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "KeepLocalDir"
         Value = "0" # The 'local_%username%' folder will be left on the system after logoff and will also be used again if the same user logs on again 
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\FSLogix\Profiles"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "PreventLoginWithFailure"
         Value = "1" # Prevent user login when a failure occurs while attaching an FSLogix container
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\FSLogix\Profiles"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "PreventLoginWithTempProfile"
         Value = "1" # Prevent user login when a user receives a temporary Windows profile
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\FSLogix\Profiles"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "VHDLocations"
         Value = $FslogixStorageAccountPath # The location where FSLogix Profile VHDs are stored
         Type  = "String"
     },
     @{
-        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "SizeInMBs"
+        Value = 10000   # quota in MB (e.g. 10000 = 10 GB)
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptIn"
         Value = $TenantId # Tenant ID
         Type  = "String"
     },
     @{
-        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptInWithNotification"
         Value = "0" # Hide success notification after move
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptInDesktop"
         Value = "1" # Automatically move the Desktop folder to OneDrive without prompting the user
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptInDocuments"
         Value = "1" # Automatically move the Documents folder to OneDrive without prompting the user
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "KFMSilentOptInPictures"
         Value = "1" # Automatically move the Pictures folder to OneDrive without prompting the user
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM\SOFTWARE\Policies\Microsoft\OneDrive"
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
         Name  = "FilesOnDemandEnabled"
         Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
         Type  = "DWord"
