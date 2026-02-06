@@ -138,6 +138,44 @@ $registryUpdates = @(
         Name  = "FilesOnDemandEnabled"
         Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
         Type  = "DWord"
+    },
+    # Storage Sense – Allow Storage Sense (Global)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "AllowStorageSenseGlobal"
+        Value = 1   # 1 = Enabled
+        Type  = "DWord"
+    },
+    # Storage Sense – Allow Temporary Files Cleanup
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "AllowStorageSenseTemporaryFilesCleanup"
+        Value = 1   # 1 = Enabled
+        Type  = "DWord"
+    },
+    # Storage Sense – Cloud content dehydration threshold (OneDrive)
+    # "Delete unused cloud‑backed content" after N days (here: 1 day)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "ConfigStorageSenseCloudContentDehydrationThreshold"
+        Value = 1   # days
+        Type  = "DWord"
+    },
+    # Storage Sense – Downloads cleanup threshold
+    # "Delete files in Downloads that haven't been opened for N days" (here: 7 days)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "ConfigStorageSenseDownloadsCleanupThreshold"
+        Value = 7  # days
+        Type  = "DWord"
+    },
+    # Storage Sense – Recycle Bin cleanup threshold
+    # "Delete files in Recycle Bin if they've been there for N days" (here: 7 days)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "ConfigStorageSenseRecycleBinCleanupThreshold"
+        Value = 7   # days
+        Type  = "DWord"
     }
 )
 
