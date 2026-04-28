@@ -1,181 +1,194 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12  
-  
-# Define the log file path  
-$logFile = "C:\bootstrap.log"
-  
-# Start logging everything to the transcript file  
-Start-Transcript -Path $logFile -Append
-    
-# Install NuGet  
-try {
-    # mkdir "$Env:ProgramFiles\NuGet" -Force -Verbose
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Verbose
-    # Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "$Env:ProgramFiles\NuGet\nuget.exe" -Verbose
-    Write-Output "NuGet installed successfully."
-} catch {  
-    Write-Output "Failed to install NuGet: $_"  
-}
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
 
-# # Install dotnet
-# try {
-#     Write-Output "Installing dotnet"
-#     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://dot.net/v1/dotnet-install.ps1'))
-# } catch {
-#     Write-Output "Failed to install dotnet: $_"
-# }
-
-# # Install Chocolatey
-# try {
-#     Write-Output "Installing Chocolatey"
-#     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-# } catch {
-#     Write-Output "Failed to install Chocolatey: $_"
-# }
-  
-# # Install WinGet  
-# try {  
-#     Install-Module -Name Microsoft.WinGet.Client -Force -Verbose
-#     Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -Verbose
-#     Write-Output "WinGet installed successfully."  
-# } catch {  
-#     Write-Output "Failed to install WinGet: $_"  
-# }  
-  
-# Reset Windows Terminal  
-# try {  
-#     Get-AppxPackage Microsoft.WindowsTerminal -AllUsers | Reset-AppPackage -Verbose
-#     Write-Output "Windows Terminal reset successfully."  
-# } catch {  
-#     Write-Output "Failed to reset Windows Terminal: $_"  
-# }
-
-# Install Basic Utility Packages
-
-# Function to install a package and log results  
-function Install-Package {  
-    param (  
-        [string]$packageId,
-        [string]$URL,
-        [string]$installParams
-    )  
-    try {
-        Write-Output "Downloading package $packageId..."
-        Start-BitsTransfer -Source $URL -Destination "$env:temp" -Verbose
-        Write-Output "Installing package $packageId..."
-        If ($URL.EndsWith(".msi")){Start-Process "msiexec.exe" -ArgumentList "/i $env:temp\$($url.Split("/")[-1]) /norestart /qn" -Wait}
-        ElseIf ($URL.EndsWith(".exe")){Start-Process "$env:temp\$($url.Split("/")[-1])" -ArgumentList "$installParams" -Wait}
-        Else {Write-Output "Incompatible installer file"}
-        #cd "$env:ProgramFiles\NuGet"
-        #.\nuget.exe install $packageId -Source "https://api.nuget.org/v3/index.json" -Verbosity detailed
-        Write-Output "Installed package $packageId successfully."  
-    } catch {  
-        Write-Output "Failed to install package ${packageId}: $_"  
-    }  
-}  
-
-# List of WinGet package IDs  
-<#$packages = @(  
-    "Microsoft.WindowsAppSDK",
-    "7zip",
-    "notepadplusplus",
-    "GitForWindows",
-    "python"
-    "texstudio",
-    "tortoisesvn"
-)#> 
-
-$packages = @(
-    # @{
-    #     packageId = "Microsoft.WindowsAppSDK"
-    #     URL = "https://aka.ms/windowsappsdk/1.4/1.4.240802001/windowsappruntimeinstall-x64.exe"
-    #     installParams = "--quiet --force --msix"
-    # },
-    # @{
-    #     packageId = "Microsoft Windows Desktop Runtime"
-    #     URL = "https://download.visualstudio.microsoft.com/download/pr/f1e7ffc8-c278-4339-b460-517420724524/f36bb75b2e86a52338c4d3a90f8dac9b/windowsdesktop-runtime-8.0.12-win-x64.exe"
-    #     installParams = "/install /quiet /norestart"
-    # },
-    @{
-        packageId = "7zip"
-        URL = "https://www.7-zip.org/$((iwr -Uri "https://www.7-zip.org/download.html" -UseBasicParsing | Select -ExpandProperty Links | Where -Property href -like "*-x64.msi")[0].href)"
-        installParams = ""
-    },
-    @{
-        packageId = "NotePad++"
-        URL = $(((iwr -URI $("https://notepad-plus-plus.org$(((iwr -Uri "https://notepad-plus-plus.org" -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "/downloads/v*").href)") -UseBasicParsing) | Select -ExpandProperty links | Where -Property href -like "*npp.*.installer.x64.exe").href | Select -Index 0)
-        installParams = "/S /noUpdater"
-    }
-    # @{
-    #     packageId = "Python"
-    #     URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
-    #     installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
-    # },
-    # @{
-    #     packageId = "Git"
-    #     URL = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
-    #     installParams = "/VERYSILENT /NORESTART"
-    # },
-    # @{
-    #     packageId = "JAGS"
-    #     URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
-    #     installParams = "/S"
-    # }
+param(
+    [Parameter(Mandatory = $true)] [string] $FslogixStorageAccountPath,
+    [Parameter(Mandatory = $true)] [string] $TenantId
 )
 
-# Loop through each package and install it  
-foreach ($package in $packages) {  
-    Install-Package -packageId $package.packageId -URL $package.URL -installParams $package.installParams
+$script:TranscriptStarted = $false
+
+function Start-BootstrapTranscript {
+    param(
+        [Parameter(Mandatory = $true)] [string] $Path
+    )
+
+    Start-Transcript -Path $Path -Append
+    $script:TranscriptStarted = $true
 }
 
-# # Remove Windows Bloatware
-# ##Get appx Packages
-# $Packages = Get-AppxPackage
+function Invoke-ProcessAndAssert {
+    param(
+        [Parameter(Mandatory = $true)] [string] $FilePath,
+        [string] $ArgumentList,
+        [string] $WorkingDirectory
+    )
 
-# ##Create Your allowlist
-# $AllowList = @(
-#     '*WindowsCalculator*',
-#     '*Office.OneNote*',
-#     '*Microsoft.net*',
-#     '*WindowsStore*',
-#     '*WindowsTerminal*',
-#     '*WindowsNotepad*',
-#     '*Paint*',
-#     '*Microsoft.PowerAutomateDesktop*',
-#     '*Microsoft.CompanyPortal*',
-#     '*Microsoft.Windows.Photos*',
-#     '*Microsoft.HEIFImageExtension*',
-#     '*Microsoft.HEVCVideoExtension*',
-#     '*Microsoft.RawImageExtension*',
-#     '*Microsoft.VP9VideoExtensions*',
-#     '*Microsoft.WebMediaExtensions*',
-#     '*Microsoft.WebpImageExtension*',
-#     '*Microsoft.WindowsAppRuntime*'
-# )
+    $startParams = @{
+        FilePath = $FilePath
+        Wait = $true
+        PassThru = $true
+        ErrorAction = 'Stop'
+    }
 
-# ###Get All Dependencies
-# ForEach($Dependency in $AllowList){
-#     (Get-AppxPackage  -Name “$Dependency”).dependencies | ForEach-Object{
-#         $NewAdd = "*" + $_.Name + "*"
-#         if($_.name -ne $null -and $AllowList -notcontains $NewAdd){
-#             $AllowList += $NewAdd
-#        }
-#     }
-# }
+    if ($null -ne $ArgumentList -and $ArgumentList -ne '') {
+        $startParams.ArgumentList = $ArgumentList
+    }
 
-# ##View all applications not in your allowlist
-# ForEach($App in $Packages){
-#     $Matched = $false
-#     Foreach($Item in $AllowList){
-#         If($App -like $Item){
-#             $Matched = $true
-#             break
-#         }
-#     }
-#     ###Nonremovable attribute does not exist before 1809, so if you are running this on an earlier build, remove “-and $app.NonRemovable -eq $false” rt; it attempts to remove everything
-#     if($matched -eq $false -and $app.NonRemovable -eq $false){
-#         Get-AppxPackage -AllUsers -Name $App.Name -PackageTypeFilter Bundle | Remove-AppxPackage -AllUsers -Verbose
-#     }
-# }
+    if ($null -ne $WorkingDirectory -and $WorkingDirectory -ne '') {
+        $startParams.WorkingDirectory = $WorkingDirectory
+    }
+
+    $process = Start-Process @startParams
+    if ($process.ExitCode -ne 0) {
+        throw "Process '$FilePath' failed with exit code $($process.ExitCode)."
+    }
+}
+
+function Install-NuGetProvider {
+    try {
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Verbose
+        Write-Output "NuGet installed successfully."
+    }
+    catch {
+        Write-Error "Failed to install NuGet: $_"
+        throw
+    }
+}
+
+function Install-UtilityPackage {
+    param (
+        [Parameter(Mandatory = $true)] [string] $PackageId,
+        [Parameter(Mandatory = $true)] [string] $Url,
+        [string] $InstallParams
+    )
+
+    try {
+        Write-Output "Downloading package $PackageId..."
+        Start-BitsTransfer -Source $Url -Destination "$env:temp" -Verbose
+
+        $installerName = [System.IO.Path]::GetFileName($Url)
+        $installerPath = Join-Path -Path $env:temp -ChildPath $installerName
+
+        Write-Output "Installing package $PackageId..."
+        if ($Url.EndsWith(".msi")) {
+            Invoke-ProcessAndAssert -FilePath "msiexec.exe" -ArgumentList "/i $installerPath /norestart /qn"
+        }
+        elseif ($Url.EndsWith(".exe")) {
+            Invoke-ProcessAndAssert -FilePath $installerPath -ArgumentList $InstallParams
+        }
+        else {
+            throw "Incompatible installer file for $PackageId: $Url"
+        }
+
+        Write-Output "Installed package $PackageId successfully."
+    }
+    catch {
+        Write-Error "Failed to install package ${PackageId}: $_"
+        throw
+    }
+}
+
+function Get-7ZipDownloadUrl {
+    return (
+        (Invoke-WebRequest -Uri "https://www.7-zip.org/download.html" -UseBasicParsing |
+            Select-Object -ExpandProperty Links |
+            Where-Object -Property href -like "*-x64.msi")[0].href
+    )
+}
+
+function Get-NotepadPlusPlusDownloadUrl {
+    $downloadPageHref = (
+        Invoke-WebRequest -Uri "https://notepad-plus-plus.org" -UseBasicParsing |
+            Select-Object -ExpandProperty links |
+            Where-Object -Property href -like "/downloads/v*"
+    ).href
+
+    $downloadPageUrl = "https://notepad-plus-plus.org$downloadPageHref"
+
+    return (
+        (Invoke-WebRequest -Uri $downloadPageUrl -UseBasicParsing |
+            Select-Object -ExpandProperty links |
+            Where-Object -Property href -like "*npp.*.installer.x64.exe").href |
+            Select-Object -Index 0
+    )
+}
+
+function Get-UtilityPackages {
+    return @(
+        # @{
+        #     packageId = "Microsoft.WindowsAppSDK"
+        #     URL = "https://aka.ms/windowsappsdk/1.4/1.4.240802001/windowsappruntimeinstall-x64.exe"
+        #     installParams = "--quiet --force --msix"
+        # },
+        # @{
+        #     packageId = "Microsoft Windows Desktop Runtime"
+        #     URL = "https://download.visualstudio.microsoft.com/download/pr/f1e7ffc8-c278-4339-b460-517420724524/f36bb75b2e86a52338c4d3a90f8dac9b/windowsdesktop-runtime-8.0.12-win-x64.exe"
+        #     installParams = "/install /quiet /norestart"
+        # },
+        @{
+            packageId = "7zip"
+            URL = (Get-7ZipDownloadUrl)
+            installParams = ""
+        },
+        @{
+            packageId = "NotePad++"
+            URL = (Get-NotepadPlusPlusDownloadUrl)
+            installParams = "/S /noUpdater"
+        }
+        # @{
+        #     packageId = "Python"
+        #     URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
+        #     installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
+        # },
+        # @{
+        #     packageId = "Git"
+        #     URL = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
+        #     installParams = "/VERYSILENT /NORESTART"
+        # },
+        # @{
+        #     packageId = "JAGS"
+        #     URL = "https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe"
+        #     installParams = "/S"
+        # }
+    )
+}
+
+function Install-UtilityPackages {
+    $packages = Get-UtilityPackages
+    foreach ($package in $packages) {
+        Install-UtilityPackage -PackageId $package.packageId -Url $package.URL -InstallParams $package.installParams
+    }
+}
+
+## Remove Standard Apps
+function Remove-StandardApps {
+    $standardApps = @(
+        'Teams',
+        'Outlook'
+    )
+
+    foreach ($app in $standardApps) {
+        Get-WmiObject -Class Win32_product | Where-Object { $_.name -match $app } | ForEach-Object {
+            $uninstallResult = $_.Uninstall()
+            if ($uninstallResult.ReturnValue -ne 0) {
+                throw "WMI uninstall failed for '$($_.Name)' with return code $($uninstallResult.ReturnValue)."
+            }
+        }
+
+        $installEntries = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall |
+            Get-ItemProperty |
+            Where-Object { $_.DisplayName -match $app } |
+            Select-Object DisplayName, InstallLocation, UninstallString
+
+        if ($installEntries) {
+            foreach ($install in $installEntries) {
+                Invoke-ProcessAndAssert -FilePath $install.UninstallString -ArgumentList "/S" -WorkingDirectory $install.InstallLocation
+            }
+        }
+    }
+}
 
 # Create Default User Profile registry settings
 Function Set-RegistryValue {
@@ -195,22 +208,15 @@ Function Set-RegistryValue {
     Set-ItemProperty -Path $Path -Name $Name -Value $Value -Type $Type -Force
 }
 
-# Registry updates to be performed
-$registryUpdates = @(
-    # Enable Kerberos ticket retrieval for Azure Files
-    @{
-        Path  = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
-        Name  = "CloudKerberosTicketRetrievalEnabled"
-        Value = 1
-        Type  = "DWord"
-    },
-    # Disable Windows Copilot
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Policies\Microsoft\Windows\WindowsCopilot"
-        Name  = "TurnOffWindowsCopilot"
-        Value = 1
-        Type  = "DWord"
-    },
+function Get-RegistryUpdates {
+    return @(
+    # # Disable Windows Copilot
+    # @{
+    #     Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Policies\Microsoft\Windows\WindowsCopilot"
+    #     Name  = "TurnOffWindowsCopilot"
+    #     Value = 1
+    #     Type  = "DWord"
+    # },
     # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
     @{
         Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
@@ -256,6 +262,20 @@ $registryUpdates = @(
         Value = "3" # 3 = fit
         Type  = "String"
     },
+    # Enable Kerberos ticket retrieval for Azure Files
+    @{
+        Path  = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
+        Name  = "CloudKerberosTicketRetrievalEnabled"
+        Value = 1
+        Type  = "DWord"
+    },
+    # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
+    @{
+        Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
+        Name  = "PreInstalledAppsEnabled"
+        Value = "0"
+        Type  = "DWord"
+    },
     @{
         Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
         Name  = "SIDDirNamePattern"
@@ -279,24 +299,157 @@ $registryUpdates = @(
         Name  = "VHDNameMatch"
         Value = "%username%" # use netID only
         Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Apps"
+        Name  = "CleanupInvalidSessions"
+        Value = "1" # Cleans out registry keys in the HKEY_LOCAL_MACHINE hive that refer to a users SID. 
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "Enabled"
+        Value = "1" # Controls whether or not the Profiles feature is active 
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "KeepLocalDir"
+        Value = "0" # The 'local_%username%' folder will be left on the system after logoff and will also be used again if the same user logs on again 
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "PreventLoginWithFailure"
+        Value = "1" # Prevent user login when a failure occurs while attaching an FSLogix container
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "PreventLoginWithTempProfile"
+        Value = "1" # Prevent user login when a user receives a temporary Windows profile
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "VHDLocations"
+        Value = $FslogixStorageAccountPath # The location where FSLogix Profile VHDs are stored
+        Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+        Name  = "SizeInMBs"
+        Value = 30000   # quota in MB (e.g. 10000 = 10 GB)
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "KFMSilentOptIn"
+        Value = $TenantId # Tenant ID
+        Type  = "String"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "KFMSilentOptInWithNotification"
+        Value = "0" # Hide success notification after move
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "KFMSilentOptInDesktop"
+        Value = "1" # Automatically move the Desktop folder to OneDrive without prompting the user
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "KFMSilentOptInDocuments"
+        Value = "1" # Automatically move the Documents folder to OneDrive without prompting the user
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "KFMSilentOptInPictures"
+        Value = "1" # Automatically move the Pictures folder to OneDrive without prompting the user
+        Type  = "DWord"
+    },
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+        Name  = "FilesOnDemandEnabled"
+        Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
+        Type  = "DWord"
+    },
+    # Storage Sense – Allow Storage Sense (Global)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "AllowStorageSenseGlobal"
+        Value = 1   # 1 = Enabled
+        Type  = "DWord"
+    },
+    # Storage Sense – Allow Temporary Files Cleanup
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "AllowStorageSenseTemporaryFilesCleanup"
+        Value = 1   # 1 = Enabled
+        Type  = "DWord"
+    },
+    # Storage Sense – Cloud content dehydration threshold (OneDrive)
+    # "Delete unused cloud‑backed content" after N days (here: 1 day)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "ConfigStorageSenseCloudContentDehydrationThreshold"
+        Value = 30   # days
+        Type  = "DWord"
+    },
+    # Storage Sense – Recycle Bin cleanup threshold
+    # "Delete files in Recycle Bin if they've been there for N days" (here: 7 days)
+    @{
+        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+        Name  = "ConfigStorageSenseRecycleBinCleanupThreshold"
+        Value = 7   # days
+        Type  = "DWord"
     }
-)
-
-foreach ($update in $registryUpdates) {
-    Set-RegistryValue -Path $update.Path -Name $update.Name -Value $update.Value -Type $update.Type
+    )
 }
 
-# Copy icon and create shortcut
-Start-BitsTransfer -Source "https://raw.githubusercontent.com/CU-CommunityApps/ct-az-templates/master/scripts/avd/ccss/signout.ico" -Destination "$env:windir\system32\signout.ico" -Verbose
+function Apply-RegistryUpdates {
+    $registryUpdates = Get-RegistryUpdates
+    foreach ($update in $registryUpdates) {
+        Set-RegistryValue -Path $update.Path -Name $update.Name -Value $update.Value -Type $update.Type
+    }
+}
 
-# Create executable shortcut
-$shell = New-Object -comObject WScript.Shell
-$shortcut = $shell.CreateShortcut("$env:public\desktop\Sign out.lnk")
-$shortcut.TargetPath = "powershell.exe"
-$shortcut.Arguments =  "-Command `"logoff`""
-$shortcut.IconLocation = "$env:windir\system32\signout.ico"
-$shortcut.WindowStyle = 7
-$shortcut.Save()
+function New-SignOutShortcut {
+    Start-BitsTransfer -Source "https://raw.githubusercontent.com/CU-CommunityApps/ct-az-templates/master/scripts/avd/ccss/signout.ico" -Destination "$env:windir\system32\signout.ico" -Verbose
 
-# Stop the transcript  
-Stop-Transcript
+    $shell = New-Object -comObject WScript.Shell
+    $shortcut = $shell.CreateShortcut("$env:public\desktop\Sign out.lnk")
+    $shortcut.TargetPath = "powershell.exe"
+    $shortcut.Arguments = "-Command `"logoff`""
+    $shortcut.IconLocation = "$env:windir\system32\signout.ico"
+    $shortcut.WindowStyle = 7
+    $shortcut.Save()
+}
+
+function Invoke-Bootstrap {
+    $logFile = "C:\bootstrap.log"
+    Start-BootstrapTranscript -Path $logFile
+
+    try {
+        Install-NuGetProvider
+        Install-UtilityPackages
+        Remove-StandardApps
+        Apply-RegistryUpdates
+        New-SignOutShortcut
+    }
+    catch {
+        Write-Error "Bootstrap failed: $_"
+        throw
+    }
+    finally {
+        if ($script:TranscriptStarted) {
+            Stop-Transcript
+        }
+    }
+}
+
+Invoke-Bootstrap
