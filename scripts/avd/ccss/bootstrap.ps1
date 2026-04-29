@@ -1,6 +1,5 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12  
 $ErrorActionPreference = 'Stop'
-Set-StrictMode -Version Latest
 
 param(
     [Parameter(Mandatory = $true)] [string] $FslogixStorageAccountPath,
