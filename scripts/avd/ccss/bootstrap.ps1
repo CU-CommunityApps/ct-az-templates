@@ -93,10 +93,10 @@ function Install-UtilityPackage {
 
         Write-Output "Installing package $PackageId..."
         if ($installerPath.EndsWith(".msi")) {
-            Invoke-ProcessAndAssert -FilePath "msiexec.exe" -ArgumentList "/i $installerPath /norestart /qn" -Wait
+            Invoke-ProcessAndAssert -FilePath "msiexec.exe" -ArgumentList "/i $installerPath /norestart /qn"
         }
         elseif ($installerPath.EndsWith(".exe")) {
-            Invoke-ProcessAndAssert -FilePath $installerPath -ArgumentList $InstallParams -Wait
+            Invoke-ProcessAndAssert -FilePath $installerPath -ArgumentList $InstallParams
         }
         else {
             throw "Incompatible installer file for ${PackageId}: $installerPath"
