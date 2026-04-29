@@ -169,21 +169,6 @@ function Install-UtilityPackages {
     }
 }
 
-## Remove MSIX Apps
-function Remove-MSIXApps {
-    $msixApps = @(
-        'Teams',
-        'Outlook'
-    )
-
-    foreach ($app in $msixApps) {
-        Get-AppxPackage -AllUsers | Select Name, PackageFullName | Where-Object { $_.Name -like "*$app*" } | ForEach-Object {
-            Write-Output "Removing app package: $($_.PackageFullName)"
-            Remove-AppxPackage -Package $_.PackageFullName -AllUsers -Verbose
-        }
-    }
-}
-
 # Create Default User Profile registry settings
 Function Set-RegistryValue {
     Param (
@@ -443,7 +428,6 @@ function Invoke-Bootstrap {
     try {
         Install-PackageProviderModule -Name NuGet -MinimumVersion 2.8.5.201
         Install-UtilityPackages
-        Remove-StandardApps
         Apply-RegistryUpdates
         New-SignOutShortcut
     }
