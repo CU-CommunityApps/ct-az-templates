@@ -143,7 +143,7 @@ function Get-UtilityPackages {
             packageId = "Mozilla Firefox"
             URL = (Invoke-WebRequest -Uri "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US" -Method Head -MaximumRedirection 5 -UseBasicParsing).BaseResponse.ResponseUri.AbsoluteUri
             installParams = "/S"
-        },
+        }
         # @{
         #     packageId = "Python"
         #     URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
@@ -169,30 +169,17 @@ function Install-UtilityPackages {
     }
 }
 
-## Remove Standard Apps
-function Remove-StandardApps {
-    $standardApps = @(
+## Remove MSIX Apps
+function Remove-MSIXApps {
+    $msixApps = @(
         'Teams',
         'Outlook'
     )
 
-    foreach ($app in $standardApps) {
-        Get-WmiObject -Class Win32_product | Where-Object { $_.name -match $app } | ForEach-Object {
-            $uninstallResult = $_.Uninstall()
-            if ($uninstallResult.ReturnValue -ne 0) {
-                throw "WMI uninstall failed for '$($_.Name)' with return code $($uninstallResult.ReturnValue)."
-            }
-        }
-
-        $installEntries = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall |
-            Get-ItemProperty |
-            Where-Object { $_.DisplayName -match $app } |
-            Select-Object DisplayName, InstallLocation, UninstallString
-
-        if ($installEntries) {
-            foreach ($install in $installEntries) {
-                Invoke-ProcessAndAssert -FilePath $install.UninstallString -ArgumentList "/S" -WorkingDirectory $install.InstallLocation
-            }
+    foreach ($app in $msixApps) {
+        Get-AppxPackage -AllUsers | Select Name, PackageFullName | Where-Object { $_.Name -like "*$app*" } | ForEach-Object {
+            Write-Output "Removing app package: $($_.PackageFullName)"
+            Remove-AppxPackage -Package $_.PackageFullName -AllUsers -Verbose
         }
     }
 }
