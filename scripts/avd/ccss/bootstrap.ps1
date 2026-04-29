@@ -4,7 +4,8 @@ Set-StrictMode -Version Latest
 
 param(
     [Parameter(Mandatory = $true)] [string] $FslogixStorageAccountPath,
-    [Parameter(Mandatory = $true)] [string] $TenantId
+    [Parameter(Mandatory = $true)] [string] $TenantId,
+    [Parameter(Mandatory = $true)] [string] $CCSSAdminStorageAccountName
 )
 
 $script:TranscriptStarted = $false
@@ -413,6 +414,18 @@ function Get-RegistryUpdates {
         Name  = "ConfigStorageSenseRecycleBinCleanupThreshold"
         Value = 7   # days
         Type  = "DWord"
+    },
+    @{
+        $Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
+        $Name = "MapDrive"
+        $value = "PowerShell.exe -WindowStyle hidden -File \\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1"
+        $type="String"
+    },
+    @{
+        $Path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\windows.net\$CCSSAdminStorageAccountName.file.core"
+        $Name = "file"
+        $value = 2
+        $type="DWord"
     }
     )
 }
