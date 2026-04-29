@@ -416,16 +416,16 @@ function Get-RegistryUpdates {
         Type  = "DWord"
     },
     @{
-        $Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-        $Name = "MapDrive"
-        $value = "PowerShell.exe -WindowStyle hidden -File \\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1"
-        $type="String"
+        Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
+        Name  = "MapDrive"
+        Value = "cmd /c start /min "" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1"""
+        Type  = "String"
     },
     @{
-        $Path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\windows.net\$CCSSAdminStorageAccountName.file.core"
-        $Name = "file"
-        $value = 2
-        $type="DWord"
+        Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\windows.net\$CCSSAdminStorageAccountName.file.core"
+        Name  = "file"
+        Value = 2
+        Type  = "DWord"
     }
     )
 }
