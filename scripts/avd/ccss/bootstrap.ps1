@@ -46,13 +46,28 @@ function Invoke-ProcessAndAssert {
     }
 }
 
-function Install-NuGetProvider {
+function Install-PackageProviderModule {
+    param (
+        [Parameter(Mandatory = $true)] [string] $Name,
+        [string] $MinimumVersion
+    )
+
     try {
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Verbose
-        Write-Output "NuGet installed successfully."
+        $installParams = @{
+            Name = $Name
+            Force = $true
+            Verbose = $true
+        }
+
+        if ($MinimumVersion) {
+            $installParams.MinimumVersion = $MinimumVersion
+        }
+
+        Install-PackageProvider @installParams
+        Write-Output "$Name provider installed successfully."
     }
     catch {
-        Write-Error "Failed to install NuGet: $_"
+        Write-Error "Failed to install ${Name} provider: $_"
         throw
     }
 }
@@ -66,20 +81,24 @@ function Install-UtilityPackage {
 
     try {
         Write-Output "Downloading package $PackageId..."
-        Start-BitsTransfer -Source $Url -Destination "$env:temp" -Verbose
+        $installerName = [System.IO.Path]::GetFileName(([System.Uri] $Url).AbsolutePath)
+        if ([string]::IsNullOrWhiteSpace($installerName)) {
+            throw "Unable to resolve a download file name for package '${PackageId}' from URL '$Url'."
+        }
 
-        $installerName = [System.IO.Path]::GetFileName($Url)
         $installerPath = Join-Path -Path $env:temp -ChildPath $installerName
 
+        Start-BitsTransfer -Source $Url -Destination $installerPath -Verbose
+
         Write-Output "Installing package $PackageId..."
-        if ($Url.EndsWith(".msi")) {
-            Invoke-ProcessAndAssert -FilePath "msiexec.exe" -ArgumentList "/i $installerPath /norestart /qn"
+        if ($installerPath.EndsWith(".msi")) {
+            Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $installerPath /norestart /qn" -Wait
         }
-        elseif ($Url.EndsWith(".exe")) {
-            Invoke-ProcessAndAssert -FilePath $installerPath -ArgumentList $InstallParams
+        elseif ($installerPath.EndsWith(".exe")) {
+            Start-Process -FilePath $installerPath -ArgumentList $InstallParams -Wait
         }
         else {
-            throw "Incompatible installer file for $PackageId: $Url"
+            throw "Incompatible installer file for ${PackageId}: $installerPath"
         }
 
         Write-Output "Installed package $PackageId successfully."
@@ -88,31 +107,6 @@ function Install-UtilityPackage {
         Write-Error "Failed to install package ${PackageId}: $_"
         throw
     }
-}
-
-function Get-7ZipDownloadUrl {
-    return (
-        (Invoke-WebRequest -Uri "https://www.7-zip.org/download.html" -UseBasicParsing |
-            Select-Object -ExpandProperty Links |
-            Where-Object -Property href -like "*-x64.msi")[0].href
-    )
-}
-
-function Get-NotepadPlusPlusDownloadUrl {
-    $downloadPageHref = (
-        Invoke-WebRequest -Uri "https://notepad-plus-plus.org" -UseBasicParsing |
-            Select-Object -ExpandProperty links |
-            Where-Object -Property href -like "/downloads/v*"
-    ).href
-
-    $downloadPageUrl = "https://notepad-plus-plus.org$downloadPageHref"
-
-    return (
-        (Invoke-WebRequest -Uri $downloadPageUrl -UseBasicParsing |
-            Select-Object -ExpandProperty links |
-            Where-Object -Property href -like "*npp.*.installer.x64.exe").href |
-            Select-Object -Index 0
-    )
 }
 
 function Get-UtilityPackages {
@@ -129,14 +123,26 @@ function Get-UtilityPackages {
         # },
         @{
             packageId = "7zip"
-            URL = (Get-7ZipDownloadUrl)
+            URL = (Invoke-WebRequest -Uri "https://www.7-zip.org/download.html" -UseBasicParsing | 
+                Select-Object -ExpandProperty Links | 
+                Where-Object -Property href -like "*-x64.msi")[0].href
             installParams = ""
         },
         @{
             packageId = "NotePad++"
-            URL = (Get-NotepadPlusPlusDownloadUrl)
+            URL = (Invoke-WebRequest -Uri "https://notepad-plus-plus.org$((Invoke-WebRequest -Uri "https://notepad-plus-plus.org" -UseBasicParsing | 
+                Select-Object -ExpandProperty links | 
+                Where-Object -Property href -like "/downloads/v*").href)" -UseBasicParsing | 
+                Select-Object -ExpandProperty links | 
+                Where-Object -Property href -like "*npp.*.installer.x64.exe").href | 
+                Select-Object -Index 0
             installParams = "/S /noUpdater"
-        }
+        },
+        @{
+            packageId = "Mozilla Firefox"
+            URL = (Invoke-WebRequest -Uri "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US" -Method Head -MaximumRedirection 5 -UseBasicParsing).BaseResponse.ResponseUri.AbsoluteUri
+            installParams = "/S"
+        },
         # @{
         #     packageId = "Python"
         #     URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
@@ -435,7 +441,7 @@ function Invoke-Bootstrap {
     Start-BootstrapTranscript -Path $logFile
 
     try {
-        Install-NuGetProvider
+        Install-PackageProviderModule -Name NuGet -MinimumVersion 2.8.5.201
         Install-UtilityPackages
         Remove-StandardApps
         Apply-RegistryUpdates
