@@ -2,9 +2,9 @@
 $ErrorActionPreference = 'Stop'
 
 param(
-    [Parameter(Mandatory = $true)] [string] $FslogixStorageAccountPath,
-    [Parameter(Mandatory = $true)] [string] $TenantId,
-    [Parameter(Mandatory = $true)] [string] $CCSSAdminStorageAccountName
+    [Parameter(Mandatory = $true)] [string]$FslogixStorageAccountPath,
+    [Parameter(Mandatory = $true)] [string]$TenantId,
+    [Parameter(Mandatory = $true)] [string]$CCSSAdminStorageAccountName
 )
 
 $script:TranscriptStarted = $false
