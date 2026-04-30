@@ -425,7 +425,7 @@ function Invoke-Bootstrap {
     Start-BootstrapTranscript -Path $logFile
 
     try {
-        Install-PackageProviderModule -Name NuGet -MinimumVersion 2.8.5.201
+        # Install-PackageProviderModule -Name NuGet -MinimumVersion 2.8.5.201
         Install-UtilityPackages
         Apply-RegistryUpdates
         New-SignOutShortcut
