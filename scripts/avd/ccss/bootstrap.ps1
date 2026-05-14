@@ -1,12 +1,10 @@
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12  
-$ErrorActionPreference = 'Stop'
-
 param(
     [Parameter(Mandatory = $true)] [string]$FslogixStorageAccountPath,
     [Parameter(Mandatory = $true)] [string]$TenantId,
     [Parameter(Mandatory = $true)] [string]$CCSSAdminStorageAccountName
 )
-
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12  
+$ErrorActionPreference = 'Stop'
 $script:TranscriptStarted = $false
 
 function Start-BootstrapTranscript {
