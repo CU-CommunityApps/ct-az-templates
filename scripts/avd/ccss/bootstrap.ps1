@@ -123,8 +123,8 @@ function Get-UtilityPackages {
             packageId = "7zip"
             URL = (Invoke-WebRequest -Uri "https://www.7-zip.org/download.html" -UseBasicParsing | 
                 Select-Object -ExpandProperty Links | 
-                Where-Object -Property href -like "*-x64.msi")[0].href
-            installParams = ""
+                Where-Object -Property href -like "*-x64.exe")[0].href
+            installParams = "/S"
         },
         @{
             packageId = "NotePad++"
