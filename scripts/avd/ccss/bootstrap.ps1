@@ -186,230 +186,230 @@ Function Set-RegistryValue {
 
 function Get-RegistryUpdates {
     return @(
-    @{
-        Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-        Name  = "WallpaperStyle"
-        Value = "3" # 3 = fit
-        Type  = "String"
-    },
-    # Enable Kerberos ticket retrieval for Azure Files
-    @{
-        Path  = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
-        Name  = "CloudKerberosTicketRetrievalEnabled"
-        Value = 1
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "SIDDirNamePattern"
-        Value = "%username%" # use netID only
-        Type  = "String"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "SIDDirNameMatch"
-        Value = "%username%" # use netID only
-        Type  = "String"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "VHDNamePattern"
-        Value = "%username%" # use netID only
-        Type  = "String"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "VHDNameMatch"
-        Value = "%username%" # use netID only
-        Type  = "String"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Apps"
-        Name  = "CleanupInvalidSessions"
-        Value = "1" # Cleans out registry keys in the HKEY_LOCAL_MACHINE hive that refer to a users SID. 
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "Enabled"
-        Value = "1" # Controls whether or not the Profiles feature is active 
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "KeepLocalDir"
-        Value = "0" # The 'local_%username%' folder will be left on the system after logoff and will also be used again if the same user logs on again 
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "PreventLoginWithFailure"
-        Value = "1" # Prevent user login when a failure occurs while attaching an FSLogix container
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "PreventLoginWithTempProfile"
-        Value = "1" # Prevent user login when a user receives a temporary Windows profile
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "VHDLocations"
-        Value = $FslogixStorageAccountPath # The location where FSLogix Profile VHDs are stored
-        Type  = "String"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
-        Name  = "SizeInMBs"
-        Value = 30000   # quota in MB (e.g. 10000 = 10 GB)
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
-        Name  = "KFMSilentOptIn"
-        Value = $TenantId # Tenant ID
-        Type  = "String"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
-        Name  = "KFMSilentOptInWithNotification"
-        Value = "0" # Hide success notification after move
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
-        Name  = "KFMSilentOptInDesktop"
-        Value = "1" # Automatically move the Desktop folder to OneDrive without prompting the user
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
-        Name  = "KFMSilentOptInDocuments"
-        Value = "1" # Automatically move the Documents folder to OneDrive without prompting the user
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
-        Name  = "KFMSilentOptInPictures"
-        Value = "1" # Automatically move the Pictures folder to OneDrive without prompting the user
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
-        Name  = "FilesOnDemandEnabled"
-        Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
-        Type  = "DWord"
-    },
-    # Storage Sense – Allow Storage Sense (Global)
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
-        Name  = "AllowStorageSenseGlobal"
-        Value = 1   # 1 = Enabled
-        Type  = "DWord"
-    },
-    # Storage Sense – Allow Temporary Files Cleanup
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
-        Name  = "AllowStorageSenseTemporaryFilesCleanup"
-        Value = 1   # 1 = Enabled
-        Type  = "DWord"
-    },
-    # Storage Sense – Cloud content dehydration threshold (OneDrive)
-    # "Delete unused cloud‑backed content" after N days (here: 1 day)
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
-        Name  = "ConfigStorageSenseCloudContentDehydrationThreshold"
-        Value = 30   # days
-        Type  = "DWord"
-    },
-    # Storage Sense – Recycle Bin cleanup threshold
-    # "Delete files in Recycle Bin if they've been there for N days" (here: 7 days)
-    @{
-        Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
-        Name  = "ConfigStorageSenseRecycleBinCleanupThreshold"
-        Value = 7   # days
-        Type  = "DWord"
-    },
-    @{
-        Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\windows.net\$CCSSAdminStorageAccountName.file.core"
-        Name  = "file"
-        Value = 2
-        Type  = "DWord"
-    }
+        @{
+            Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+            Name  = "WallpaperStyle"
+            Value = "3" # 3 = fit
+            Type  = "String"
+        },
+        # Enable Kerberos ticket retrieval for Azure Files
+        @{
+            Path  = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
+            Name  = "CloudKerberosTicketRetrievalEnabled"
+            Value = 1
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "SIDDirNamePattern"
+            Value = "%username%" # use netID only
+            Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "SIDDirNameMatch"
+            Value = "%username%" # use netID only
+            Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "VHDNamePattern"
+            Value = "%username%" # use netID only
+            Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "VHDNameMatch"
+            Value = "%username%" # use netID only
+            Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Apps"
+            Name  = "CleanupInvalidSessions"
+            Value = "1" # Cleans out registry keys in the HKEY_LOCAL_MACHINE hive that refer to a users SID. 
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "Enabled"
+            Value = "1" # Controls whether or not the Profiles feature is active 
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "KeepLocalDir"
+            Value = "0" # The 'local_%username%' folder will be left on the system after logoff and will also be used again if the same user logs on again 
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "PreventLoginWithFailure"
+            Value = "1" # Prevent user login when a failure occurs while attaching an FSLogix container
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "PreventLoginWithTempProfile"
+            Value = "1" # Prevent user login when a user receives a temporary Windows profile
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "VHDLocations"
+            Value = $FslogixStorageAccountPath # The location where FSLogix Profile VHDs are stored
+            Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
+            Name  = "SizeInMBs"
+            Value = 30000   # quota in MB (e.g. 10000 = 10 GB)
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "KFMSilentOptIn"
+            Value = $TenantId # Tenant ID
+            Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "KFMSilentOptInWithNotification"
+            Value = "0" # Hide success notification after move
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "KFMSilentOptInDesktop"
+            Value = "1" # Automatically move the Desktop folder to OneDrive without prompting the user
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "KFMSilentOptInDocuments"
+            Value = "1" # Automatically move the Documents folder to OneDrive without prompting the user
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "KFMSilentOptInPictures"
+            Value = "1" # Automatically move the Pictures folder to OneDrive without prompting the user
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "FilesOnDemandEnabled"
+            Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
+            Type  = "DWord"
+        },
+        # Storage Sense – Allow Storage Sense (Global)
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+            Name  = "AllowStorageSenseGlobal"
+            Value = 1   # 1 = Enabled
+            Type  = "DWord"
+        },
+        # Storage Sense – Allow Temporary Files Cleanup
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+            Name  = "AllowStorageSenseTemporaryFilesCleanup"
+            Value = 1   # 1 = Enabled
+            Type  = "DWord"
+        },
+        # Storage Sense – Cloud content dehydration threshold (OneDrive)
+        # "Delete unused cloud‑backed content" after N days (here: 1 day)
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+            Name  = "ConfigStorageSenseCloudContentDehydrationThreshold"
+            Value = 30   # days
+            Type  = "DWord"
+        },
+        # Storage Sense – Recycle Bin cleanup threshold
+        # "Delete files in Recycle Bin if they've been there for N days" (here: 7 days)
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
+            Name  = "ConfigStorageSenseRecycleBinCleanupThreshold"
+            Value = 7   # days
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\windows.net\$CCSSAdminStorageAccountName.file.core"
+            Name  = "file"
+            Value = 2
+            Type  = "DWord"
+        }
     )
 }
 
 function Get-DefaultUserProfileRegistrySettings {
     return @(
         @{
-            Path = "Control Panel\Desktop"
-            Name = "Wallpaper"
+            Path = 'Control Panel\Desktop'
+            Name = 'Wallpaper'
             Value = "\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\wallpaper\ccss_wallpaper.jpg"
-            Type = "String"
+            Type = 'REG_SZ'
         },
         # Set desktop wallpaper stlye to "Fit"
         @{
-            Path  = "Control Panel\Desktop"
-            Name  = "WallpaperStyle"
-            Value = "3" # 3 = fit
-            Type  = "String"
+            Path  = 'Control Panel\Desktop'
+            Name  = 'WallpaperStyle'
+            Value = '3' # 3 = fit
+            Type  = 'REG_SZ'
         },
         @{
-            Path  = "Software\Microsoft\Windows\CurrentVersion\Policies\System"
-            Name  = "WallpaperStyle"
-            Value = "3" # 3 = fit
-            Type  = "String"
+            Path  = 'Software\Microsoft\Windows\CurrentVersion\Policies\System'
+            Name  = 'WallpaperStyle'
+            Value = '3' # 3 = fit
+            Type  = 'REG_SZ'
         }
         # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
         @{
-            Path  = "Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
-            Name  = "PreInstalledAppsEnabled"
-            Value = "0"
-            Type  = "DWord"
+            Path  = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
+            Name  = 'PreInstalledAppsEnabled'
+            Value = '0'
+            Type  = 'REG_DWORD'
         },
             # # Disable Windows Copilot
         # @{
-        #     Path  = "Software\Policies\Microsoft\Windows\WindowsCopilot"
-        #     Name  = "TurnOffWindowsCopilot"
+        #     Path  = 'Software\Policies\Microsoft\Windows\WindowsCopilot'
+        #     Name  = 'TurnOffWindowsCopilot'
         #     Value = 1
-        #     Type  = "DWord"
+        #     Type  = 'REG_DWORD'
         # },
         # Set default terminal app to Windows Terminal
         @{
-            Path  = "Console\%%Startup"
-            Name  = "DelegationConsole"
-            Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
-            Type  = "String"
+            Path  = 'Console\%%Startup'
+            Name  = 'DelegationConsole'
+            Value = '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
+            Type  = 'REG_SZ'
         },
         @{
-            Path  = "Console\%%Startup"
-            Name  = "DelegationTerminal"
-            Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
-            Type  = "String"
+            Path  = 'Console\%%Startup'
+            Name  = 'DelegationTerminal'
+            Value = '{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
+            Type  = 'REG_SZ'
         },
         @{
-            Path  = "Console\%%Startup"
-            Name  = "DelegationCommandPrompt"
-            Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
-            Type  = "String"
+            Path  = 'Console\%%Startup'
+            Name  = 'DelegationCommandPrompt'
+            Value = '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
+            Type  = 'REG_SZ'
         },
         @{
-            Path  = "Software\Microsoft\Windows\CurrentVersion\RunOnce"
-            Name  = "MapDrive"
-            Value = "cmd /c start /min "" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1"""
-            Type  = "String"
+            Path  = 'Software\Microsoft\Windows\CurrentVersion\Run'
+            Name  = 'MapDrive'
+            Value = 'cmd /c start /min "" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "\\' + $CCSSAdminStorageAccountName + '.file.core.windows.net\admin\MapDrive\mapdrive.ps1"'
+            Type  = 'REG_SZ'
         }
     )
 }
 
 function Default-UserProfileRegistrySettings{
-    reg load HKU\\DefaultUser 'C:\\Users\\Default\\NTUSER.DAT'
+    reg load HKU\DefaultUser "C:\Users\Default\NTUSER.DAT"
     $defaultUserSettings = Get-DefaultUserProfileRegistrySettings
     foreach ($update in $defaultUserSettings) {
-        reg add "HKU\\DefaultUser\\$($update.Path)" /v $update.Name /t $update.Type /d $update.Value /f
+        reg add "HKU\DefaultUser\$($update.Path)" /v "$($update.Name)" /t "$($update.Type)" /d "$($update.Value)" /f
     }
-    reg unload HKU\\DefaultUser
+    reg unload HKU\DefaultUser
 }
 
 function Apply-RegistryUpdates {
