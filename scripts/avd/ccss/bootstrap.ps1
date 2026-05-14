@@ -186,52 +186,6 @@ Function Set-RegistryValue {
 
 function Get-RegistryUpdates {
     return @(
-    # # Disable Windows Copilot
-    # @{
-    #     Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Policies\Microsoft\Windows\WindowsCopilot"
-    #     Name  = "TurnOffWindowsCopilot"
-    #     Value = 1
-    #     Type  = "DWord"
-    # },
-    # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
-        Name  = "PreInstalledAppsEnabled"
-        Value = "0"
-        Type  = "DWord"
-    },
-    # Set default terminal app to Windows Terminal
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Console\%%Startup"
-        Name  = "DelegationConsole"
-        Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
-        Type  = "String"
-    },
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Console\%%Startup"
-        Name  = "DelegationTerminal"
-        Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
-        Type  = "String"
-    },
-    # Set desktop wallpaper stlye to "Fit"
-    # @{
-    #     Path  = "Registry::HKEY_USERS\.DEFAULT\Control Panel\Desktop"
-    #     Name  = "WallpaperStyle"
-    #     Value = "3" # 3 = fit
-    #     Type  = "String"
-    # },
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-        Name  = "WallpaperStyle"
-        Value = "3" # 3 = fit
-        Type  = "String"
-    },
-    @{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-        Name  = "WallpaperStyle"
-        Value = "3" # 3 = fit
-        Type  = "String"
-    },
     @{
         Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
         Name  = "WallpaperStyle"
@@ -243,13 +197,6 @@ function Get-RegistryUpdates {
         Path  = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\Kerberos\Parameters"
         Name  = "CloudKerberosTicketRetrievalEnabled"
         Value = 1
-        Type  = "DWord"
-    },
-    # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
-    @{
-        Path  = "Registry::HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
-        Name  = "PreInstalledAppsEnabled"
-        Value = "0"
         Type  = "DWord"
     },
     @{
@@ -385,18 +332,84 @@ function Get-RegistryUpdates {
         Type  = "DWord"
     },
     @{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-        Name  = "MapDrive"
-        Value = "cmd /c start /min "" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1"""
-        Type  = "String"
-    },
-    @{
         Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\windows.net\$CCSSAdminStorageAccountName.file.core"
         Name  = "file"
         Value = 2
         Type  = "DWord"
     }
     )
+}
+
+function Get-DefaultUserProfileRegistrySettings {
+    return @(
+        @{
+            Path = "Control Panel\Desktop"
+            Name = "Wallpaper"
+            Value = "\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\wallpaper\ccss_wallpaper.jpg"
+            Type = "String"
+        },
+        # Set desktop wallpaper stlye to "Fit"
+        @{
+            Path  = "Control Panel\Desktop"
+            Name  = "WallpaperStyle"
+            Value = "3" # 3 = fit
+            Type  = "String"
+        },
+        @{
+            Path  = "Software\Microsoft\Windows\CurrentVersion\Policies\System"
+            Name  = "WallpaperStyle"
+            Value = "3" # 3 = fit
+            Type  = "String"
+        }
+        # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
+        @{
+            Path  = "Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
+            Name  = "PreInstalledAppsEnabled"
+            Value = "0"
+            Type  = "DWord"
+        },
+            # # Disable Windows Copilot
+        # @{
+        #     Path  = "Software\Policies\Microsoft\Windows\WindowsCopilot"
+        #     Name  = "TurnOffWindowsCopilot"
+        #     Value = 1
+        #     Type  = "DWord"
+        # },
+        # Set default terminal app to Windows Terminal
+        @{
+            Path  = "Console\%%Startup"
+            Name  = "DelegationConsole"
+            Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+            Type  = "String"
+        },
+        @{
+            Path  = "Console\%%Startup"
+            Name  = "DelegationTerminal"
+            Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+            Type  = "String"
+        },
+        @{
+            Path  = "Console\%%Startup"
+            Name  = "DelegationCommandPrompt"
+            Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+            Type  = "String"
+        },
+        @{
+            Path  = "Software\Microsoft\Windows\CurrentVersion\RunOnce"
+            Name  = "MapDrive"
+            Value = "cmd /c start /min "" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1"""
+            Type  = "String"
+        }
+    )
+}
+
+function Default-UserProfileRegistrySettings{
+    reg load HKU\\DefaultUser 'C:\\Users\\Default\\NTUSER.DAT'
+    $defaultUserSettings = Get-DefaultUserProfileRegistrySettings
+    foreach ($update in $defaultUserSettings) {
+        reg add "HKU\\DefaultUser\\$($update.Path)" /v $update.Name /t $update.Type /d $update.Value /f
+    }
+    reg unload HKU\\DefaultUser
 }
 
 function Apply-RegistryUpdates {
@@ -426,6 +439,7 @@ function Invoke-Bootstrap {
         # Install-PackageProviderModule -Name NuGet -MinimumVersion 2.8.5.201
         Install-UtilityPackages
         Apply-RegistryUpdates
+        Default-UserProfileRegistrySettings
         New-SignOutShortcut
     }
     catch {
