@@ -336,6 +336,12 @@ function Get-RegistryUpdates {
             Name  = "file"
             Value = 2
             Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
+            Name  = "MapDrive"
+            Value = "cmd /c start /min `"`" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File `"\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1`""
+            Type  = "String"
         }
     )
 }
@@ -386,18 +392,6 @@ function Get-DefaultUserProfileRegistrySettings {
             Path  = 'Console\%%Startup'
             Name  = 'DelegationTerminal'
             Value = '{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
-            Type  = 'REG_SZ'
-        },
-        @{
-            Path  = 'Console\%%Startup'
-            Name  = 'DelegationCommandPrompt'
-            Value = '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
-            Type  = 'REG_SZ'
-        },
-        @{
-            Path  = 'Software\Microsoft\Windows\CurrentVersion\Run'
-            Name  = 'MapDrive'
-            Value = 'cmd /c start /min "" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "\\' + $CCSSAdminStorageAccountName + '.file.core.windows.net\admin\MapDrive\mapdrive.ps1"'
             Type  = 'REG_SZ'
         }
     )
