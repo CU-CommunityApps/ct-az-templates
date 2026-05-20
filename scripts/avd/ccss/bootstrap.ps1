@@ -348,51 +348,57 @@ function Get-RegistryUpdates {
 
 function Get-DefaultUserProfileRegistrySettings {
     return @(
+        # @{
+        #     Path = 'Control Panel\Desktop'
+        #     Name = 'Wallpaper'
+        #     Value = "\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\wallpaper\ccss_wallpaper.jpg"
+        #     Type = 'REG_SZ'
+        # },
+        # # Set desktop wallpaper stlye to "Fit"
+        # @{
+        #     Path  = 'Control Panel\Desktop'
+        #     Name  = 'WallpaperStyle'
+        #     Value = '3' # 3 = fit
+        #     Type  = 'REG_SZ'
+        # },
         @{
-            Path = 'Control Panel\Desktop'
-            Name = 'Wallpaper'
+            Path  = "Software\Microsoft\Windows\CurrentVersion\Policies\System"
+            Name  = "WallpaperStyle"
+            Value = "3" # 3 = fit
+            Type  = "REG_SZ"
+        },
+        @{
+            Path = "Software\Microsoft\Windows\CurrentVersion\Policies\System"
+            Name = "Wallpaper"
             Value = "\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\wallpaper\ccss_wallpaper.jpg"
-            Type = 'REG_SZ'
+            Type = "REG_SZ"
         },
-        # Set desktop wallpaper stlye to "Fit"
-        @{
-            Path  = 'Control Panel\Desktop'
-            Name  = 'WallpaperStyle'
-            Value = '3' # 3 = fit
-            Type  = 'REG_SZ'
-        },
-        @{
-            Path  = 'Software\Microsoft\Windows\CurrentVersion\Policies\System'
-            Name  = 'WallpaperStyle'
-            Value = '3' # 3 = fit
-            Type  = 'REG_SZ'
-        }
         # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
         @{
-            Path  = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
-            Name  = 'PreInstalledAppsEnabled'
-            Value = '0'
-            Type  = 'REG_DWORD'
+            Path  = "Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
+            Name  = "PreInstalledAppsEnabled"
+            Value = "0"
+            Type  = "REG_DWORD"
         },
             # # Disable Windows Copilot
         # @{
-        #     Path  = 'Software\Policies\Microsoft\Windows\WindowsCopilot'
-        #     Name  = 'TurnOffWindowsCopilot'
+        #     Path  = "Software\Policies\Microsoft\Windows\WindowsCopilot"
+        #     Name  = "TurnOffWindowsCopilot"
         #     Value = 1
-        #     Type  = 'REG_DWORD'
+        #     Type  = "REG_DWORD"
         # },
         # Set default terminal app to Windows Terminal
         @{
-            Path  = 'Console\%%Startup'
-            Name  = 'DelegationConsole'
-            Value = '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
-            Type  = 'REG_SZ'
+            Path  = "Console\%%Startup"
+            Name  = "DelegationConsole"
+            Value = "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+            Type  = "REG_SZ"
         },
         @{
-            Path  = 'Console\%%Startup'
-            Name  = 'DelegationTerminal'
-            Value = '{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
-            Type  = 'REG_SZ'
+            Path  = "Console\%%Startup"
+            Name  = "DelegationTerminal"
+            Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+            Type  = "REG_SZ"
         }
     )
 }
