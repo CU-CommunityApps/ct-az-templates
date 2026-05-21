@@ -202,7 +202,7 @@ function Get-RegistryUpdates {
         @{
             Path  = "HKLM:\SOFTWARE\FSLogix\Profiles"
             Name  = "FlipFlopProfileDirectoryName"
-            Value = "0" # disable to honor netID only naming
+            Value = 0 # disable to honor netID only naming
             Type  = "DWord"
         },
         @{
