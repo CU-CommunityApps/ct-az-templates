@@ -307,6 +307,12 @@ function Get-RegistryUpdates {
             Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
             Type  = "DWord"
         },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "SilentAccountConfig"
+            Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
+            Type  = "DWord"
+        },
         # Storage Sense – Allow Storage Sense (Global)
         @{
             Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
