@@ -411,6 +411,13 @@ function Get-DefaultUserProfileRegistrySettings {
             Name  = "DelegationTerminal"
             Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
             Type  = "REG_SZ"
+        },
+        # Turn off OneDrive notification pop ups
+        @{
+            Path  = "SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Microsoft.SkyDrive.Desktop"
+            Name  = "Enabled"
+            Value = "0"
+            Type  = "REG_DWORD"
         }
     )
 }
