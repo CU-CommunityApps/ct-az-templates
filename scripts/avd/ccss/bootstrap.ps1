@@ -126,16 +126,16 @@ function Get-UtilityPackages {
                 Where-Object -Property href -like "*-x64.exe")[0].href
             installParams = "/S"
         },
-        @{
-            packageId = "NotePad++"
-            URL = (Invoke-WebRequest -Uri "https://notepad-plus-plus.org$((Invoke-WebRequest -Uri "https://notepad-plus-plus.org" -UseBasicParsing | 
-                Select-Object -ExpandProperty links | 
-                Where-Object -Property href -like "/downloads/v*").href)" -UseBasicParsing | 
-                Select-Object -ExpandProperty links | 
-                Where-Object -Property href -like "*npp.*.installer.x64.exe").href | 
-                Select-Object -Index 0
-            installParams = "/S /noUpdater"
-        },
+        # @{
+        #     packageId = "NotePad++"
+        #     URL = (Invoke-WebRequest -Uri "https://notepad-plus-plus.org$((Invoke-WebRequest -Uri "https://notepad-plus-plus.org" -UseBasicParsing | 
+        #         Select-Object -ExpandProperty links | 
+        #         Where-Object -Property href -like "/downloads/v*").href)" -UseBasicParsing | 
+        #         Select-Object -ExpandProperty links | 
+        #         Where-Object -Property href -like "*npp.*.installer.x64.exe").href | 
+        #         Select-Object -Index 0
+        #     installParams = "/S /noUpdater"
+        # },
         @{
             packageId = "Mozilla Firefox"
             URL = (Invoke-WebRequest -Uri "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US" -Method Head -MaximumRedirection 5 -UseBasicParsing).BaseResponse.ResponseUri.AbsoluteUri
