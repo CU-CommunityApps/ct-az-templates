@@ -348,6 +348,18 @@ function Get-RegistryUpdates {
             Name  = "MapDrive"
             Value = "cmd /c start /min `"`" powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File `"\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\MapDrive\mapdrive.ps1`""
             Type  = "String"
+        },
+        @{
+            Path  = "HKLM:\Software\Microsoft\Cryptography\Wintrust\Config"
+            Name  = "EnableCertPaddingCheck"
+            Value = 1
+            Type  = "DWord"
+        },
+        @{
+            Path  = "HKLM:\Software\Wow6432Node\Microsoft\Cryptography\Wintrust\Config"
+            Name  = "EnableCertPaddingCheck"
+            Value = 1
+            Type  = "DWord"
         }
     )
 }
