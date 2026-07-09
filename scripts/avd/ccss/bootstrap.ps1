@@ -307,6 +307,12 @@ function Get-RegistryUpdates {
             Value = "1" # Enable OneDrive Files On-Demand, which allows users to access all their files in OneDrive without having to download them and use storage space on their device
             Type  = "DWord"
         },
+        @{
+            Path  = "HKLM:\SOFTWARE\Policies\Microsoft\OneDrive"
+            Name  = "SilentAccountConfig"
+            Value = "1" # OneDrive attempts to silently (without user interaction) sign-in to the work or school user account that was used to sign into Windows
+            Type  = "DWord"
+        },
         # Storage Sense – Allow Storage Sense (Global)
         @{
             Path  = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense"
@@ -417,6 +423,13 @@ function Get-DefaultUserProfileRegistrySettings {
             Name  = "DelegationTerminal"
             Value = "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
             Type  = "REG_SZ"
+        },
+        # Turn off OneDrive notification pop ups
+        @{
+            Path  = "SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Microsoft.SkyDrive.Desktop"
+            Name  = "Enabled"
+            Value = "0"
+            Type  = "REG_DWORD"
         }
     )
 }
