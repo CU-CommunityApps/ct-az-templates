@@ -140,12 +140,18 @@ function Get-UtilityPackages {
             packageId = "Mozilla Firefox"
             URL = (Invoke-WebRequest -Uri "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US" -Method Head -MaximumRedirection 5 -UseBasicParsing).BaseResponse.ResponseUri.AbsoluteUri
             installParams = "/S"
+        },
+        @{
+            packageId = "VSCode"
+            URL = (Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64" -Method Head -MaximumRedirection 5 -UseBasicParsing).BaseResponse.ResponseUri.AbsoluteUri
+            installParams = "/VERYSILENT /NORESTART /MERGETASKS=!runcode /SUPPRESSMSGBOXES"
         }
-        # @{
-        #     packageId = "Python"
-        #     URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-amd64.exe"
-        #     installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
-        # },
+        @{
+            packageId = "Python"
+            URL = (Invoke-WebRequest "https://www.python.org/ftp/python/$([regex]::Matches((Invoke-WebRequest "https://www.python.org/ftp/python" -UseBasicParsing).Content, '(?<=href=")(3\.14\.\d+)(?=/")').Value | `
+                Sort-Object {[version]$_} | Select-Object -Last 1)" -UseBasicParsing | Select-Object -ExpandProperty Links | Where-Object -Property href -like "*-amd64.exe").href
+            installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
+        }
         # @{
         #     packageId = "Git"
         #     URL = "https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
