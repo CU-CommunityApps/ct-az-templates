@@ -147,8 +147,9 @@ function Get-UtilityPackages {
             installParams = "/VERYSILENT /NORESTART /MERGETASKS=!runcode /SUPPRESSMSGBOXES"
         }
         @{
-            packageId = "Python"
-            URL = (Invoke-WebRequest "https://www.python.org/ftp/python/$([regex]::Matches((Invoke-WebRequest "https://www.python.org/ftp/python" -UseBasicParsing).Content, '(?<=href=")(3\.14\.\d+)(?=/")').Value | `
+            packageId = "Python314"
+            URL = $("https://www.python.org/ftp/python/$([regex]::Matches((Invoke-WebRequest "https://www.python.org/ftp/python" -UseBasicParsing).Content, '(?<=href=")(3.14.\d+)(?=/")').Value | `
+                Sort-Object {[version]$_} | Select-Object -Last 1)")+"/"+(Invoke-WebRequest "https://www.python.org/ftp/python/$([regex]::Matches((Invoke-WebRequest "https://www.python.org/ftp/python" -UseBasicParsing).Content, '(?<=href=")(3\.14\.\d+)(?=/")').Value | `
                 Sort-Object {[version]$_} | Select-Object -Last 1)" -UseBasicParsing | Select-Object -ExpandProperty Links | Where-Object -Property href -like "*-amd64.exe").href
             installParams = "/quiet InstallAllUsers=1 PrependPath=1 Include_pip=1"
         }
