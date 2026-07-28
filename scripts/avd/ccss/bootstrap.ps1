@@ -145,7 +145,7 @@ function Get-UtilityPackages {
             packageId = "VSCode"
             URL = (Invoke-WebRequest -Uri "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64" -Method Head -MaximumRedirection 5 -UseBasicParsing).BaseResponse.ResponseUri.AbsoluteUri
             installParams = "/VERYSILENT /NORESTART /MERGETASKS=!runcode /SUPPRESSMSGBOXES"
-        }
+        },
         @{
             packageId = "Python314"
             URL = $("https://www.python.org/ftp/python/$([regex]::Matches((Invoke-WebRequest "https://www.python.org/ftp/python" -UseBasicParsing).Content, '(?<=href=")(3.14.\d+)(?=/")').Value | `
