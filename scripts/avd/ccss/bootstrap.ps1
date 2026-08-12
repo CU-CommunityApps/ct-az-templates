@@ -401,7 +401,7 @@ function Get-DefaultUserProfileRegistrySettings {
         @{
             Path = "Software\Microsoft\Windows\CurrentVersion\Policies\System"
             Name = "Wallpaper"
-            Value = "\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\wallpaper\ccss_wallpaper.jpg"
+            Value = "\\$CCSSAdminStorageAccountName.file.core.windows.net\admin\CCSS_Cloud_Computing_Screen.jpg"
             Type = "REG_SZ"
         },
         # Disable MSIX automatic updates # https://learn.microsoft.com/en-us/azure/virtual-desktop/app-attach-setup?tabs=portal&pivots=app-attach#disable-automatic-updates
