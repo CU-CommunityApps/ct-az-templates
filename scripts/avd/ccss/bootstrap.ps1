@@ -468,6 +468,15 @@ function New-SignOutShortcut {
     $shortcut.WindowStyle = 7
     $shortcut.Save()
 }
+function New-MapDriveShortcut {
+    $shell = New-Object -comObject WScript.Shell
+    $shortcut = $shell.CreateShortcut("$env:public\documents\MapDrive.lnk")
+    $shortcut.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $shortcut.Arguments  = '-WindowStyle Hidden -ExecutionPolicy Bypass -File "\\ccssadmin.file.core.windows.net\admin\MapDrive\mapdrive.ps1"'
+    $shortcut.IconLocation = "$env:SystemRoot\System32\imageres.dll,28"
+    $shortcut.WindowStyle = 7
+    $shortcut.Save()
+}
 
 function Invoke-Bootstrap {
     $logFile = "C:\bootstrap.log"
@@ -479,6 +488,7 @@ function Invoke-Bootstrap {
         Apply-RegistryUpdates
         Default-UserProfileRegistrySettings
         New-SignOutShortcut
+        New-MapDriveShortcut
     }
     catch {
         Write-Error "Bootstrap failed: $_"
